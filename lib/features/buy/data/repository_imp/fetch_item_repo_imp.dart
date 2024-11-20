@@ -43,7 +43,7 @@ class FetchItemRepoImp implements FetchItemRepo {
             fetchedUnitPrice * fetchedQuantity) /
             newQuantity;
         entity.quantity = newQuantity;
-        entity.unitPrice = newUnitPrice;
+        entity.unitPrice = newUnitPrice.floorToDouble();
       }
       fetchItemDataSource.addItems(entity: entity);
       return const Left('Data added successfully');

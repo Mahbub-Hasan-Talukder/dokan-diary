@@ -1,0 +1,17 @@
+import 'package:dartz/dartz.dart';
+import 'package:diary/features/sell/domain/entities/sell_request_entity.dart';
+
+import '../repository/fetch_sell_data_repo.dart';
+import '../entities/sell_data_entity.dart';
+
+class SellDataUseCase{
+  SellDataRepo sellDataRepo;
+  SellDataUseCase(this.sellDataRepo);
+  Future<Either<List<SellDataEntity>,String>> fetchSellData({required String date})async{
+    return await sellDataRepo.fetchSellData(date: date);
+  }
+
+  Future<Either<String,String>> addSellData({required SellRequestEntity reqEntity})async{
+    return await sellDataRepo.addSellData(reqEntity: reqEntity);
+  }
+}

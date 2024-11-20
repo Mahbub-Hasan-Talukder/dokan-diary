@@ -28,7 +28,7 @@ class FetchItemCubit extends Cubit<FetchItemState> {
     required double unitPrice,
     required double itemQuantity,
   }) async {
-    String id = "${itemName}_$unitPrice";
+    String id = "${itemName}_${unitPrice.floorToDouble()}";
     AddRequestEntity entity = AddRequestEntity(
       id: id,
       itemName: itemName,
