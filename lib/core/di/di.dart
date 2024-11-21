@@ -1,4 +1,10 @@
 
+import 'package:diary/features/backup/data/data_source/data_source.dart';
+import 'package:diary/features/backup/data/data_source/firestore_imp.dart';
+import 'package:diary/features/backup/data/repository_imp/backup_repo_imp.dart';
+import 'package:diary/features/backup/domain/backup_repo/backup_repository.dart';
+import 'package:diary/features/backup/domain/backup_use_case/backup_use_case.dart';
+import 'package:diary/features/backup/presentation/cubit/backup_data_cubit.dart';
 import 'package:diary/features/sell/data/data_source/data_source.dart';
 import 'package:diary/features/sell/data/data_source/sell_data_source_imp.dart';
 import 'package:diary/features/sell/data/repository_imp/sell_data_repo_imp.dart';
@@ -25,15 +31,20 @@ void setupLocator() {
   getIt.registerFactory(()=>FetchItemCubit(getIt.call()));
   getIt.registerFactory(()=>SellDataCubit(getIt.call()));
   getIt.registerFactory(()=>FetchBoughtItemsCubit(getIt.call()));
+  getIt.registerFactory(()=>BackupDataCubit(getIt.call()));
 
   //use case
   getIt.registerLazySingleton<FetchItemUseCase>(()=>FetchItemUseCase(getIt.call()));
   getIt.registerLazySingleton<SellDataUseCase>(()=>SellDataUseCase(getIt.call()));
+  getIt.registerLazySingleton<BackUpUseCase>(()=>BackUpUseCase(getIt.call()));
 
   //repository
   getIt.registerLazySingleton<FetchItemRepo>(()=>FetchItemRepoImp(getIt.call()));
   getIt.registerLazySingleton<SellDataRepo>(()=>SellDataRepoImp(getIt.call()));
+  getIt.registerLazySingleton<BackupRepository>(()=>BackupRepoImp(getIt.call()));
+
   //data source
   getIt.registerLazySingleton<FetchItemDataSource>(()=>FetchItemDataSourceImpl());
   getIt.registerLazySingleton<SellDataSource>(()=>SellDataSourceImp());
+  getIt.registerLazySingleton<BackupDataSource>(()=>FireStoreImp());
 }
