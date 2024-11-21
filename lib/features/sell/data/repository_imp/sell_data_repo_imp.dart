@@ -1,4 +1,6 @@
 import 'package:dartz/dartz.dart';
+import 'package:diary/features/sell/data/models/FetchItemResponse.dart';
+import 'package:diary/features/sell/domain/entities/fetch_item_entity.dart';
 import 'package:diary/features/sell/domain/entities/sell_request_entity.dart';
 
 import '../models/sell_data_model.dart';
@@ -25,12 +27,27 @@ class SellDataRepoImp implements SellDataRepo {
   }
 
   @override
-  Future<Either<String, String>> addSellData({required SellRequestEntity reqEntity})async {
-    try{
+  Future<Either<String, String>> addSellData(
+      {required SellRequestEntity reqEntity}) async {
+    try {
       final result = await sellDataSource.addSellData(entity: reqEntity);
+      await sellDataSource.updateItemQuantity(reqEntity.itemId??'', reqEntity.soldQuantity??0);
       return Left(result);
-    }catch(e){
+    } catch (e) {
       return right(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<List<FetchItemEntity>, String>> fetchItems() async {
+    try {
+      final result = await sellDataSource.fetchItems();
+      final x = result.map((json) {
+        return FetchItemResponse.fromJson(json).toEntity();
+      }).toList();
+      return Left(x);
+    } catch (e) {
+      return Right(e.toString());
     }
   }
 }

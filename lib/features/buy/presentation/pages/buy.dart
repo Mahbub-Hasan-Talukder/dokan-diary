@@ -37,7 +37,6 @@ class _BuyState extends State<Buy> {
           child: BlocBuilder<FetchItemCubit, FetchItemState>(
             bloc: _fetchItemCubit,
             builder: (context, state) {
-              print('hrr: ${state.runtimeType}');
               if (state is FetchItemSuccess) {
                 return Column(
                   children: [

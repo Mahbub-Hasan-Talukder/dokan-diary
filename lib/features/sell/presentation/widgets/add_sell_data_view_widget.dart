@@ -1,18 +1,27 @@
-
+import 'package:diary/core/services/date_time_format.dart';
+import 'package:diary/features/buy/presentation/cubits/fetch_items/fetch_item_cubit.dart';
 import 'package:diary/features/sell/domain/entities/sell_data_entity.dart';
 import 'package:diary/features/sell/domain/entities/sell_request_entity.dart';
-import 'package:diary/features/sell/presentation/cubits/sell_data_cubit.dart';
+import 'package:diary/features/sell/presentation/cubits/fetch_items/fetch_bought_items_cubit.dart';
+import 'package:diary/features/sell/presentation/cubits/sell_items/sell_data_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rxdart/rxdart.dart';
+
+import '../../../../core/di/di.dart';
+import '../../domain/entities/fetch_item_entity.dart';
 
 class AddSellView extends StatefulWidget {
   final List<SellDataEntity> items;
   final SellDataCubit sellDataCubit;
+  final BehaviorSubject<DateTime> dateTime;
 
   const AddSellView({
     super.key,
     required this.items,
     required this.sellDataCubit,
+    required this.dateTime,
   });
 
   @override
@@ -24,15 +33,32 @@ class AddRecordViewState extends State<AddSellView> {
   final _itemNameController = TextEditingController();
   final _quantityController = TextEditingController();
   final _priceController = TextEditingController();
-  String? _selectedItem;
+  List<FetchItemEntity> entityList = [];
+  final FetchBoughtItemsCubit _fetchBoughtItemsCubit =
+      getIt.get<FetchBoughtItemsCubit>();
+  String _selectedId = '';
+
+  @override
+  void initState() {
+    _fetchBoughtItemsCubit.fetchItems();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _fetchBoughtItemsCubit.close();
+    _itemNameController.dispose();
+    _quantityController.dispose();
+    _priceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.grey.shade200,
-      height: MediaQuery.of(context).size.height * .25,
+      height: MediaQuery.of(context).size.height * .22,
       width: MediaQuery.of(context).size.width,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       child: Form(
         key: _formKey,
         child: formElements(context),
@@ -48,9 +74,24 @@ class AddRecordViewState extends State<AddSellView> {
             children: [
               Flexible(
                 flex: 2,
-                child: itemNameInput(),
+                child:
+                    BlocBuilder<FetchBoughtItemsCubit, FetchBoughtItemsState>(
+                  bloc: _fetchBoughtItemsCubit,
+                  builder: (context, state) {
+                    if (state is FetchItemDone) {
+                      entityList = state.entityList;
+                    }
+                    if (state is FetchItemFailed) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(state.error),
+                        ));
+                      });
+                    }
+                    return itemNameInput(entityList);
+                  },
+                ),
               ),
-
             ],
           ),
           const SizedBox(height: 5),
@@ -65,7 +106,6 @@ class AddRecordViewState extends State<AddSellView> {
                 flex: 1,
                 child: numericTextField(_quantityController, 'quantity'),
               ),
-
             ],
           ),
           const SizedBox(height: 5),
@@ -74,16 +114,7 @@ class AddRecordViewState extends State<AddSellView> {
             height: 60,
             child: ElevatedButton(
               onPressed: () {
-                if (_formKey.currentState!.validate() &&
-                    (double.tryParse(_quantityController.text) ?? 0) > 0) {
-                  double unitPrice =
-                      (double.tryParse(_priceController.text) ?? 0) /
-                          (double.tryParse(_quantityController.text) ?? 1);
-                  widget.sellDataCubit.addSellData(
-
-                    reqEntity: SellRequestEntity(itemId: itemId, soldQuantity: soldQuantity, soldPrice: soldPrice, date: date)
-                  );
-                }
+                handleOnPressed();
               },
               child: Text(
                 'Sell',
@@ -96,10 +127,37 @@ class AddRecordViewState extends State<AddSellView> {
     );
   }
 
+  void handleOnPressed() {
+    bool isValid = _formKey.currentState!.validate();
+    double quantity = double.tryParse(_quantityController.text) ?? 0;
+    double price = double.tryParse(_priceController.text) ?? 0;
+    double remainingQuantity = 0;
+    for (FetchItemEntity item in entityList) {
+      if (item.itemId == _selectedId) {
+        remainingQuantity = item.quantity ?? 0;
+      }
+    }
+    if (isValid &&
+        quantity > 0 &&
+        price > 0 &&
+        remainingQuantity >= quantity &&
+        _selectedId.isNotEmpty) {
+      double unitPrice = price / quantity;
+      widget.sellDataCubit.addSellData(
+        reqEntity: SellRequestEntity(
+          itemId: _selectedId,
+          soldQuantity: quantity,
+          soldPrice: price,
+          date: DateTimeFormat.getYMD(widget.dateTime.value),
+        ),
+      );
+    }
+  }
+
   Widget numericTextField(
-      TextEditingController controller,
-      String hintText,
-      ) {
+    TextEditingController controller,
+    String hintText,
+  ) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
@@ -113,28 +171,25 @@ class AddRecordViewState extends State<AddSellView> {
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       validator: (value) =>
-      value == null || value.isEmpty ? "Please enter value" : null,
+          value == null || value.isEmpty ? "Please enter value" : null,
     );
   }
 
-  Widget itemNameInput() {
-    return Autocomplete<SellDataEntity>(
+  Widget itemNameInput(List<FetchItemEntity> entityList) {
+    return Autocomplete<FetchItemEntity>(
       optionsBuilder: (TextEditingValue textEditingValue) {
         if (textEditingValue.text.isEmpty) {
-          return const Iterable<SellDataEntity>.empty();
+          return const Iterable<FetchItemEntity>.empty();
         }
-        return widget.items.where((item) => (item.itemName ?? '')
+        return entityList.where((item) => (item.itemId ?? '')
             .toLowerCase()
             .contains(textEditingValue.text.toLowerCase()));
       },
-      displayStringForOption: (SellDataEntity option) => option.itemId ?? '',
-      onSelected: (SellDataEntity selection) {
-        setState(() {
-          _selectedItem = selection.itemName ?? '';
-          _itemNameController.text = selection.itemName ?? '';
-          _quantityController.text = selection.quantitySold.toString();
-          _priceController.text = selection.totalPrice.toString();
-        });
+      displayStringForOption: (FetchItemEntity option) => option.itemId ?? '',
+      onSelected: (FetchItemEntity selection) {
+        _itemNameController.text = selection.itemId ?? '';
+        _quantityController.text = selection.quantity.toString();
+        _selectedId = selection.itemId ?? '';
       },
       fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
         _itemNameController.addListener(() {
@@ -143,6 +198,9 @@ class AddRecordViewState extends State<AddSellView> {
         return TextFormField(
           controller: _itemNameController,
           focusNode: focusNode,
+          onChanged: (t) {
+            _selectedId = '';
+          },
           decoration: InputDecoration(
             labelText: "Item Name",
             hintText: "Type to search and select",
@@ -152,7 +210,7 @@ class AddRecordViewState extends State<AddSellView> {
             ),
           ),
           validator: (value) =>
-          value == null || value.isEmpty ? "Please enter item name" : null,
+              value == null || value.isEmpty ? "Please enter item name" : null,
         );
       },
       optionsViewOpenDirection: OptionsViewOpenDirection.up,

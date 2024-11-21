@@ -5,7 +5,6 @@ class Records extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('in record');
     return Column(
       children: [
         Text('Records'),

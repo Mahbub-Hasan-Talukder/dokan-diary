@@ -6,6 +6,9 @@ class DateTimeFormat{
     String year = dateTime.toIso8601String().substring(0,4);
     return "$day $month, $year";
   }
+  static String getYMD(DateTime date){
+    return date.toIso8601String().substring(0,10);
+  }
    static String _getMonth(String date){
     int month = int.tryParse(date.substring(5,7)) ?? 0;
     switch (month) {

@@ -44,3 +44,4 @@ final class AddSellDataError extends SellDataState {
   @override
   List<Object?> get props => [error];
 }
+
