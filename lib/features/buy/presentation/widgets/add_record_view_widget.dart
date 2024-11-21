@@ -30,9 +30,8 @@ class AddRecordViewState extends State<AddRecordView> {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.grey.shade200,
-      height: MediaQuery.of(context).size.height * .25,
+      height: MediaQuery.of(context).size.height * .22,
       width: MediaQuery.of(context).size.width,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       child: Form(
         key: _formKey,
         child: formElements(context),
