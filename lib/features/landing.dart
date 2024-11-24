@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'sell.dart';
+import 'sell/presentation/pages/sell.dart';
 import 'records.dart';
 import 'buy/presentation/pages/buy.dart';
 

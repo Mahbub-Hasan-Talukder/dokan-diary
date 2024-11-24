@@ -13,7 +13,6 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
   @override
   Future<List<Map<String, dynamic>>> fetchItems() async {
     _db ??= await dbHelper.database;
-    _db = await dbHelper.database;
     if (_db != null) return await _db!.query('Items');
     throw Exception('Database instance not created');
   }

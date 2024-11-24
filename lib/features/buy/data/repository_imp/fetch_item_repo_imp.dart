@@ -15,7 +15,6 @@ class FetchItemRepoImp implements FetchItemRepo {
   Future<Either<List<ItemEntity>, String>> fetchItems() async {
     try {
       final response = await fetchItemDataSource.fetchItems();
-      print('hrr response ${response}');
       final res = response.map((json) {
         return ItemModel.fromJson(json).toEntity();
       }).toList();
@@ -43,7 +42,7 @@ class FetchItemRepoImp implements FetchItemRepo {
             fetchedUnitPrice * fetchedQuantity) /
             newQuantity;
         entity.quantity = newQuantity;
-        entity.unitPrice = newUnitPrice;
+        entity.unitPrice = newUnitPrice.floorToDouble();
       }
       fetchItemDataSource.addItems(entity: entity);
       return const Left('Data added successfully');

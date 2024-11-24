@@ -37,12 +37,10 @@ class _BuyState extends State<Buy> {
           child: BlocBuilder<FetchItemCubit, FetchItemState>(
             bloc: _fetchItemCubit,
             builder: (context, state) {
-              print('hrr: ${state.runtimeType}');
               if (state is FetchItemSuccess) {
-                if (state.items.isEmpty) return const Text('N/a');
                 return Column(
                   children: [
-                    buildListView(state),
+                    Expanded(child: buildListView(state)),
                     AddRecordView(
                       items: state.items,
                       fetchItemCubit: _fetchItemCubit,
@@ -76,39 +74,40 @@ class _BuyState extends State<Buy> {
     );
   }
 
-  Expanded buildListView(FetchItemSuccess state) {
+  Widget buildListView(FetchItemSuccess state) {
     final items = state.items.reversed.toList();
-    return Expanded(
-      child: ListView.separated(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          return ListTile(
-            tileColor: Colors.grey.shade300,
-            leading: const Icon(Icons.hardware),
-            title: Text(item.itemName ?? 'N/A'),
-            subtitle: Text('Price: ${item.unitPrice} tk'),
-            trailing: Text(
-              '${item.quantity}\n${item.unitType}',
-              style: Theme.of(context).textTheme.labelLarge,
-            ),
-            onLongPress: () {
-              Scaffold.of(context).showBottomSheet(
-                (context) {
-                  return modalSheetView(
-                    context,
-                    item.itemName ?? 'N/A',
-                    item.unitPrice.toString(),
-                  );
-                },
-              );
-            },
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return const SizedBox(height: 5);
-        },
-      ),
+    if(items.isEmpty){
+      return Text('no data');
+    }
+    return ListView.separated(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return ListTile(
+          tileColor: Colors.grey.shade300,
+          leading: const Icon(Icons.hardware),
+          title: Text(item.itemName ?? 'N/A'),
+          subtitle: Text('Price: ${item.unitPrice?.toStringAsFixed(2)} tk'),
+          trailing: Text(
+            '${item.quantity}\n${item.unitType}',
+            style: Theme.of(context).textTheme.labelLarge,
+          ),
+          onLongPress: () {
+            Scaffold.of(context).showBottomSheet(
+              (context) {
+                return modalSheetView(
+                  context,
+                  item.itemName ?? 'N/A',
+                  item.unitPrice.toString(),
+                );
+              },
+            );
+          },
+        );
+      },
+      separatorBuilder: (BuildContext context, int index) {
+        return const SizedBox(height: 5);
+      },
     );
   }
 
@@ -121,38 +120,39 @@ class _BuyState extends State<Buy> {
       color: Theme.of(context).colorScheme.shadow,
       height: 100,
       width: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const SizedBox(),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Spacer(),
               const Text(
                 'Delete this record?',
                 style: TextStyle(color: Colors.white),
               ),
-              const Spacer(),
-              IconButton(
+              ElevatedButton(
                 onPressed: () {
+                  _fetchItemCubit.deleteItem(itemName: itemName, price: price);
                   Navigator.of(context).pop();
                 },
-                icon: const Icon(
-                  Icons.cancel_outlined,
-                  color: Colors.white,
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.white),
                 ),
-              ),
+              )
             ],
           ),
-          ElevatedButton(
+          IconButton(
             onPressed: () {
-              _fetchItemCubit.deleteItem(itemName: itemName, price: price);
               Navigator.of(context).pop();
             },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.white),
+            icon: const Icon(
+              Icons.cancel_outlined,
+              color: Colors.white,
             ),
-          )
+          ),
         ],
       ),
     );
