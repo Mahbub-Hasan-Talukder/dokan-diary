@@ -8,6 +8,8 @@ import '../../domain/entities/sell_data_entity.dart';
 import '../cubits/sell_items/sell_data_cubit.dart';
 import 'package:flutter/material.dart';
 
+import '../cubits/undo_record/undo_record_cubit.dart';
+
 class Sell extends StatefulWidget {
   const Sell({super.key});
 
@@ -17,12 +19,14 @@ class Sell extends StatefulWidget {
 
 class _SellState extends State<Sell> {
   final SellDataCubit _sellDataCubit = getIt.get<SellDataCubit>();
+  UndoRecordCubit _undoRecordCubit = getIt.get<UndoRecordCubit>();
   final BehaviorSubject<DateTime> dateStream =
       BehaviorSubject.seeded(DateTime.now());
 
   @override
   void dispose() {
     _sellDataCubit.close();
+    _undoRecordCubit.close();
     super.dispose();
   }
 
@@ -113,6 +117,22 @@ class _SellState extends State<Sell> {
               )
             ],
           ),
+          onLongPress: () {
+            if (item.saleId != null &&
+                item.quantitySold != null &&
+                item.itemId != null) {
+              Scaffold.of(context).showBottomSheet(
+                (context) {
+                  return modalSheetView(
+                    context: context,
+                    saleId: item.saleId!,
+                    quantitySold: item.quantitySold!,
+                    itemId: item.itemId!,
+                  );
+                },
+              );
+            }
+          },
         );
       },
       separatorBuilder: (BuildContext context, int index) {
@@ -171,6 +191,73 @@ class _SellState extends State<Sell> {
           const Spacer(),
           Icon(Icons.monetization_on_rounded, color: iconColor),
           Text('${totalProfit.toStringAsFixed(2)} tk'),
+        ],
+      ),
+    );
+  }
+
+  Container modalSheetView({
+    required BuildContext context,
+    required int saleId,
+    required String itemId,
+    required double quantitySold,
+  }) {
+    return Container(
+      color: Theme.of(context).colorScheme.shadow,
+      height: 100,
+      width: double.infinity,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(
+              Icons.cancel_outlined,
+              color: Colors.white,
+            ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Undo this record?',
+                style: TextStyle(color: Colors.white),
+              ),
+              BlocBuilder<UndoRecordCubit, UndoRecordState>(
+                bloc: _undoRecordCubit,
+                builder: (context, state) {
+                  if (state is UndoRecordError) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(state.message)),
+                      );
+                    });
+                  }
+                  if(state is UndoRecordSuccess){
+                    _sellDataCubit.fetchSellData(date: dateStream.value);
+                  }
+                  return ElevatedButton(
+                    onPressed: () {
+                      _undoRecordCubit.undoSell(
+                        saleId: saleId,
+                        itemId: itemId,
+                        quantitySold: quantitySold,
+                      );
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      'Undo',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                },
+              )
+            ],
+          ),
+          const SizedBox(),
         ],
       ),
     );

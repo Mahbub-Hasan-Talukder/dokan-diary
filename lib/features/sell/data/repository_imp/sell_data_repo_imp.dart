@@ -31,7 +31,8 @@ class SellDataRepoImp implements SellDataRepo {
       {required SellRequestEntity reqEntity}) async {
     try {
       final result = await sellDataSource.addSellData(entity: reqEntity);
-      await sellDataSource.updateItemQuantity(reqEntity.itemId??'', reqEntity.soldQuantity??0);
+      await sellDataSource.updateItemQuantity(
+          reqEntity.itemId ?? '', reqEntity.remainingQuantity ?? 0, 'Items');
       return Left(result);
     } catch (e) {
       return right(e.toString());
@@ -46,6 +47,35 @@ class SellDataRepoImp implements SellDataRepo {
         return FetchItemResponse.fromJson(json).toEntity();
       }).toList();
       return Left(x);
+    } catch (e) {
+      return Right(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, String>> undoSell({
+    required int saleId,
+    required double quantitySold,
+    required String itemId,
+  }) async {
+    try {
+      final items = await sellDataSource.fetchItems();
+      FetchItemEntity? entity;
+      for (Map<String, dynamic> jsonItem in items) {
+        if (jsonItem['item_id'] == itemId) {
+          entity = FetchItemResponse.fromJson(jsonItem).toEntity();
+          break;
+        }
+      }
+      if (entity != null) {
+        await sellDataSource.updateItemQuantity(
+          itemId,
+          entity.quantity! + quantitySold,
+          'Items',
+        );
+      }
+      await sellDataSource.deleteItem(id: saleId);
+      return const Left('Successfully returned');
     } catch (e) {
       return Right(e.toString());
     }

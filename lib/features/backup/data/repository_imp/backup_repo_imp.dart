@@ -11,7 +11,6 @@ class BackupRepoImp implements BackupRepository{
   Future<Either<String, String>> restoreData()async {
     try{
       final data = await backupDataSource.restore('Items');
-      // print('hrr: ${data.docs.first}');
       return Left('Success');
     }catch(e){
       Right(e.toString());

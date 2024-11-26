@@ -17,7 +17,7 @@ class SellDataSourceImp implements SellDataSource {
       // await _db!.rawDelete('DELETE FROM Sales;');
       // await _db!.rawDelete('DELETE FROM Items;');
       final result = await _db!.rawQuery('''
-        SELECT i.item_name, i.item_id, item_unit_price, s.sale_date, s.quantity_sold, s.total_price
+        SELECT i.item_name, i.item_id, i.item_unit_price, s.sale_id, s.sale_date, s.quantity_sold, s.total_price
         FROM Sales s JOIN Items i 
         ON s.item_id = i.item_id
         WHERE s.sale_date = ?;
@@ -48,15 +48,26 @@ class SellDataSourceImp implements SellDataSource {
   }
 
   @override
-  Future<void> updateItemQuantity(String itemId, double newQuantity) async {
+  Future<void> updateItemQuantity(String itemId, double newQuantity, String tableName) async {
     _db ??= await dbHelper.database;
     if(_db!=null){
       await _db!.rawUpdate('''
-        UPDATE Items
+        UPDATE $tableName
         SET item_quantity = ?
         WHERE item_id = ?;
       ''', [newQuantity, itemId]);
     }
+  }
 
+  @override
+  Future<void> deleteItem({required int id}) async {
+    _db ??= await dbHelper.database;
+    if (_db != null) {
+      await _db!.rawDelete('''
+        DELETE FROM Sales WHERE sale_id = ?;
+      ''', [id]);
+      return;
+    }
+    throw Exception('Database instance not created');
   }
 }

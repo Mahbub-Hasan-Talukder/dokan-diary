@@ -131,16 +131,16 @@ class AddRecordViewState extends State<AddSellView> {
     bool isValid = _formKey.currentState!.validate();
     double quantity = double.tryParse(_quantityController.text) ?? 0;
     double price = double.tryParse(_priceController.text) ?? 0;
-    double remainingQuantity = 0;
+    double existingQuantity = 0;
     for (FetchItemEntity item in entityList) {
       if (item.itemId == _selectedId) {
-        remainingQuantity = item.quantity ?? 0;
+        existingQuantity = item.quantity ?? 0;
       }
     }
     if (isValid &&
-        quantity > 0 &&
+        quantity <= existingQuantity &&
         price > 0 &&
-        remainingQuantity >= quantity &&
+        existingQuantity > 0 &&
         _selectedId.isNotEmpty) {
       double unitPrice = price / quantity;
       widget.sellDataCubit.addSellData(
@@ -149,6 +149,7 @@ class AddRecordViewState extends State<AddSellView> {
           soldQuantity: quantity,
           soldPrice: price,
           date: DateTimeFormat.getYMD(widget.dateTime.value),
+          remainingQuantity: existingQuantity-quantity,
         ),
       );
     }

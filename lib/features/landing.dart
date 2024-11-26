@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'backup/presentation/widgets/restore_widget.dart';
+import 'backup/presentation/widgets/upload_widget.dart';
 import 'sell/presentation/pages/sell.dart';
-import 'records.dart';
+import 'records/presentation/pages/records.dart';
 import 'buy/presentation/pages/buy.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,6 +25,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Diary'),
         centerTitle: true,
       ),
+      drawer:buildDrawer(),
       body: SafeArea(
         child: Column(
           children: [
@@ -35,7 +38,7 @@ class _HomePageState extends State<HomePage> {
                   } else if (snapshot.data == 1) {
                     return const Sell();
                   }
-                  return const Records();
+                  return Records();
                 },
               ),
             ),
@@ -64,6 +67,17 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Drawer buildDrawer() {
+    return const Drawer(
+      child: Column(
+        children: [
+          UploadWidget(),
+          RestoreWidget(),
+        ],
       ),
     );
   }
