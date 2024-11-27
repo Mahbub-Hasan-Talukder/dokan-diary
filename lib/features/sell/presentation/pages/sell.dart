@@ -103,7 +103,14 @@ class _SellState extends State<Sell> {
           tileColor: Colors.grey.shade300,
           leading: const Icon(Icons.hardware),
           title: Text(item.itemName ?? 'N/A'),
-          subtitle: Text('Profit: ${item.profit?.toStringAsFixed(2)} tk'),
+          subtitle: Text(
+            'Profit: ${item.profit?.toStringAsFixed(2)} tk',
+            style: TextStyle(
+              color: ((item.profit ?? 0) < 0)
+                  ? Colors.red.shade800
+                  : Colors.green.shade800,
+            ),
+          ),
           trailing: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -236,7 +243,7 @@ class _SellState extends State<Sell> {
                       );
                     });
                   }
-                  if(state is UndoRecordSuccess){
+                  if (state is UndoRecordSuccess) {
                     _sellDataCubit.fetchSellData(date: dateStream.value);
                   }
                   return ElevatedButton(

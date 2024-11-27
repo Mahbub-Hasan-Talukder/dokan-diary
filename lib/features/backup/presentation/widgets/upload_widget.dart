@@ -21,43 +21,53 @@ class _UploadWidgetState extends State<UploadWidget> {
   }
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BackupDataCubit, BackupDataState>(
-      bloc: _backupDataCubit,
-      builder: (context, state) {
-        if (state is UploadDataLoading) {
-          return const SizedBox(
-            height: 10,
-            width: 10,
-            child: CircularProgressIndicator(),
+    return SafeArea(
+      child: BlocBuilder<BackupDataCubit, BackupDataState>(
+        bloc: _backupDataCubit,
+        builder: (context, state) {
+          if (state is UploadDataLoading) {
+            return const SizedBox(
+              height: 10,
+              width: 10,
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (state is UploadDataSuccess) {
+            WidgetsBinding.instance.addPostFrameCallback((t) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.successMsg),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                ),
+              );
+            });
+          }
+          if (state is UploadDataFailed) {
+            WidgetsBinding.instance.addPostFrameCallback((t) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.error),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            });
+          }
+          return ElevatedButton(
+            onPressed: () {
+              _backupDataCubit.uploadData();
+            },
+            style: ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(
+                Theme.of(context).colorScheme.primary,
+              ),
+              foregroundColor: WidgetStatePropertyAll(
+                Theme.of(context).colorScheme.surface,
+              ),
+            ),
+            child: Text('Upload'),
           );
-        }
-        if (state is UploadDataSuccess) {
-          WidgetsBinding.instance.addPostFrameCallback((t) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.successMsg),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-              ),
-            );
-          });
-        }
-        if (state is UploadDataFailed) {
-          WidgetsBinding.instance.addPostFrameCallback((t) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error),
-                backgroundColor: Theme.of(context).colorScheme.error,
-              ),
-            );
-          });
-        }
-        return IconButton(
-          onPressed: () {
-            _backupDataCubit.uploadData();
-          },
-          icon: const Icon(Icons.upload),
-        );
-      },
+        },
+      ),
     );
   }
 }

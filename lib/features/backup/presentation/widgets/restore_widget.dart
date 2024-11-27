@@ -51,11 +51,19 @@ class _RestoreWidgetState extends State<RestoreWidget> {
             );
           });
         }
-        return IconButton(
+        return ElevatedButton(
           onPressed: () {
             _backupDataCubit.restoreData();
           },
-          icon: const Icon(Icons.download),
+          style: ButtonStyle(
+            backgroundColor: WidgetStatePropertyAll(
+              Theme.of(context).colorScheme.primary,
+            ),
+            foregroundColor: WidgetStatePropertyAll(
+              Theme.of(context).colorScheme.surface,
+            ),
+          ),
+          child: Text('Restore'),
         );
       },
     );

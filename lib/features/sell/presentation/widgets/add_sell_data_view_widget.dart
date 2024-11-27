@@ -170,7 +170,7 @@ class AddRecordViewState extends State<AddSellView> {
         labelText: hintText,
       ),
       keyboardType: TextInputType.number,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      // inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       validator: (value) =>
           value == null || value.isEmpty ? "Please enter value" : null,
     );

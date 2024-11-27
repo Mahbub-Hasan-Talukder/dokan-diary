@@ -1,47 +1,45 @@
-import 'package:diary/core/services/date_time_format.dart';
-import 'package:diary/features/records/domain/entities/day_wise_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rxdart/rxdart.dart';
 
 import '../../../../core/di/di.dart';
 import '../../domain/entities/filter_entity.dart';
-import '../bloc/day_wise_records/day_wise_cubit.dart';
+import '../../domain/entities/item_wise_entity.dart';
+import '../bloc/item_wise_records/item_wise_cubit.dart';
 
-class DayWiseRecordsView extends StatefulWidget {
-  const DayWiseRecordsView({super.key, required this.filterEntity});
-
+class ItemWiseRecordsView extends StatefulWidget {
+  const ItemWiseRecordsView({super.key, required this.filterEntity});
   final FilterEntity filterEntity;
 
   @override
-  State<DayWiseRecordsView> createState() => _DayWiseRecordsViewState();
+  State<ItemWiseRecordsView> createState() => _ItemWiseRecordsViewState();
 }
 
-class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
-  final DayWiseCubit _dayWiseCubit = getIt.get<DayWiseCubit>();
+class _ItemWiseRecordsViewState extends State<ItemWiseRecordsView> {
+
+  final ItemWiseCubit _dayWiseCubit = getIt.get<ItemWiseCubit>();
 
   @override
   void initState() {
-    _dayWiseCubit.fetchDateWiseRecords();
+    _dayWiseCubit.fetchItemWiseRecords();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DayWiseCubit, DayWiseState>(
+    return BlocBuilder<ItemWiseCubit, ItemWiseState>(
       bloc: _dayWiseCubit,
       builder: (context, state) {
-        if (state is DayWiseLoading) {
+        if (state is ItemWiseLoading) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (state is DayWiseError) {
+        if (state is ItemWiseError) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.error)),
             );
           });
         }
-        if (state is DayWiseSuccess) {
+        if (state is ItemWiseSuccess) {
           if (state.records.isEmpty) {
             return const Center(child: Text('No data found'));
           }
@@ -52,8 +50,7 @@ class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
       },
     );
   }
-
-  Widget buildListView(List<DayWiseEntity> records) {
+  Widget buildListView(List<ItemWiseEntity> records) {
     records = _getSortedRecord(records: records);
     return Expanded(
       child: ListView.builder(
@@ -61,17 +58,13 @@ class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
         itemBuilder: (context, index) {
           double totalSell = records[index].totalSell ?? 0;
           double totalPurchase = records[index].purchaseCost ?? 0;
-          String date = records[index].date ?? DateTime.now().toIso8601String();
+          String itemName = records[index].itemName ?? 'N/A';
           double percentage = records[index].percentage ?? 0;
           return ListTile(
             title: Text(
-              DateTimeFormat.getPrettyDate(
-                DateTime.parse(
-                  date,
-                ),
-              ),
+              itemName
             ),
-            leading: const Icon(Icons.date_range),
+            leading: const Icon(Icons.pin_drop_outlined),
             subtitle: Text(
               'Purchase: $totalPurchase',
               style: const TextStyle(fontSize: 14),
@@ -104,19 +97,16 @@ class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
       ),
     );
   }
-
-  // List<DayWiseEntity> _getSortedRecord({required orderType, required List<DayWiseEntity> records}) {}
-
-  List<DayWiseEntity> _getSortedRecord({
-    required List<DayWiseEntity> records,
+  List<ItemWiseEntity> _getSortedRecord({
+    required List<ItemWiseEntity> records,
   }) {
     print(widget.filterEntity.sortingOrder);
     if (widget.filterEntity.sortingOrder == SortingOrder.ascending) {
       if ((widget.filterEntity.targetAttribute ??
-              TargetAttribute.percentage) ==
+          TargetAttribute.percentage) ==
           TargetAttribute.percentage) {
         records.sort(
-          (a, b) => (a.percentage ?? 0).compareTo(b.percentage ?? 0,),
+              (a, b) => (a.percentage ?? 0).compareTo(b.percentage ?? 0,),
         );
       }
       if ((widget.filterEntity.targetAttribute ??

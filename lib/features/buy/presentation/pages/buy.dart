@@ -87,7 +87,7 @@ class _BuyState extends State<Buy> {
           tileColor: Colors.grey.shade300,
           leading: const Icon(Icons.hardware),
           title: Text(item.itemName ?? 'N/A'),
-          subtitle: Text('Price: ${item.unitPrice?.toStringAsFixed(2)} tk'),
+          subtitle: Text('Unit Price: ${item.unitPrice?.toStringAsFixed(2)} tk'),
           trailing: Text(
             '${item.quantity}\n${item.unitType}',
             style: Theme.of(context).textTheme.labelLarge,

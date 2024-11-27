@@ -3,4 +3,9 @@ abstract class RecordsDataSource{
     String? startDate,
     String? endDate,
   });
+
+  Future<List<Map<String, dynamic>>> fetchItemWiseSellInfo({
+    String? startDate,
+    String? endDate,
+  });
 }

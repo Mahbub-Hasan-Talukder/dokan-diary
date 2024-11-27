@@ -61,7 +61,7 @@ class AddRecordViewState extends State<AddRecordView> {
             children: [
               Flexible(
                 flex: 2,
-                child: numericTextField(_unitPriceController, 'price'),
+                child: numericTextField(_unitPriceController, 'total price'),
               ),
               Flexible(
                 flex: 1,
@@ -115,7 +115,7 @@ class AddRecordViewState extends State<AddRecordView> {
         labelText: hintText,
       ),
       keyboardType: TextInputType.number,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      // inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       validator: (value) =>
           value == null || value.isEmpty ? "Please enter value" : null,
     );
