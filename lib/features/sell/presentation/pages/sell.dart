@@ -95,7 +95,6 @@ class _SellState extends State<Sell> {
     if (items.isEmpty) {
       return const Center(child: Text('No data found'));
     }
-    items.sort((a, b) => b.itemName!.compareTo(a.itemName ?? ''));
     return ListView.separated(
       itemCount: items.length,
       itemBuilder: (context, index) {

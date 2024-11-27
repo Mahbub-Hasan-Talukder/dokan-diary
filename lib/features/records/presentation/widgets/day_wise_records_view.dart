@@ -105,12 +105,9 @@ class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
     );
   }
 
-  // List<DayWiseEntity> _getSortedRecord({required orderType, required List<DayWiseEntity> records}) {}
-
   List<DayWiseEntity> _getSortedRecord({
     required List<DayWiseEntity> records,
   }) {
-    print(widget.filterEntity.sortingOrder);
     if (widget.filterEntity.sortingOrder == SortingOrder.ascending) {
       if ((widget.filterEntity.targetAttribute ?? TargetAttribute.percentage) ==
           TargetAttribute.percentage) {

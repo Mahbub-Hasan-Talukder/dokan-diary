@@ -99,7 +99,6 @@ class _ItemWiseRecordsViewState extends State<ItemWiseRecordsView> {
   List<ItemWiseEntity> _getSortedRecord({
     required List<ItemWiseEntity> records,
   }) {
-    print(widget.filterEntity.sortingOrder);
     if (widget.filterEntity.sortingOrder == SortingOrder.ascending) {
       if ((widget.filterEntity.targetAttribute ?? TargetAttribute.percentage) ==
           TargetAttribute.percentage) {

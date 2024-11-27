@@ -8,7 +8,6 @@ class FireStoreImp implements BackupDataSource {
   Future<QuerySnapshot<Map<String, dynamic>>> restore(String tableName) async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
         await fireStore.collection(tableName).get();
-    // print(snapshot);
     return snapshot;
   }
 
@@ -17,7 +16,6 @@ class FireStoreImp implements BackupDataSource {
     List<Map<String, dynamic>> items,
     String tableName,
   ) async {
-    print(items);
     CollectionReference itemsCollection = fireStore.collection(tableName);
     if (items.isEmpty) return;
     WriteBatch batch = fireStore.batch();
