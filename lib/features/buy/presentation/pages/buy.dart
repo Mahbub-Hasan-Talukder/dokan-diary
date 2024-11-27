@@ -40,6 +40,8 @@ class _BuyState extends State<Buy> {
               if (state is FetchItemSuccess) {
                 return Column(
                   children: [
+                    Center(child: Text("Total items: ${state.items.length}")),
+                    const Divider(color: Colors.grey),
                     Expanded(child: buildListView(state)),
                     AddRecordView(
                       items: state.items,
@@ -76,9 +78,12 @@ class _BuyState extends State<Buy> {
 
   Widget buildListView(FetchItemSuccess state) {
     final items = state.items.reversed.toList();
-    if(items.isEmpty){
-      return Text('no data');
+    if (items.isEmpty) {
+      return const Text('No data');
     }
+
+    items.sort((a, b) => a.itemName!.compareTo(b.itemName ?? ''));
+
     return ListView.separated(
       itemCount: items.length,
       itemBuilder: (context, index) {
@@ -87,9 +92,9 @@ class _BuyState extends State<Buy> {
           tileColor: Colors.grey.shade300,
           leading: const Icon(Icons.hardware),
           title: Text(item.itemName ?? 'N/A'),
-          subtitle: Text('Unit Price: ${item.unitPrice?.toStringAsFixed(2)} tk'),
+          subtitle: Text('Unit P: ${item.unitPrice?.toStringAsFixed(2)} tk'),
           trailing: Text(
-            '${item.quantity}\n${item.unitType}',
+            '${item.quantity?.toStringAsFixed(2)}\n${item.unitType}',
             style: Theme.of(context).textTheme.labelLarge,
           ),
           onLongPress: () {
@@ -97,7 +102,7 @@ class _BuyState extends State<Buy> {
               (context) {
                 return modalSheetView(
                   context,
-                  item.itemName ?? 'N/A',
+                  item.id ?? 'N/A',
                   item.unitPrice.toString(),
                 );
               },
@@ -113,7 +118,7 @@ class _BuyState extends State<Buy> {
 
   Container modalSheetView(
     BuildContext context,
-    String itemName,
+    String itemId,
     String price,
   ) {
     return Container(
@@ -134,7 +139,7 @@ class _BuyState extends State<Buy> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  _fetchItemCubit.deleteItem(itemName: itemName, price: price);
+                  _fetchItemCubit.deleteItem(itemId: itemId, price: price);
                   Navigator.of(context).pop();
                 },
                 child: const Text(

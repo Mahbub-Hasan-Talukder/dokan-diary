@@ -127,7 +127,7 @@ class AddRecordViewState extends State<AddRecordView> {
       child: DropdownButtonFormField<String>(
         value: _selectedUnit,
         decoration: const InputDecoration(labelText: "Unit Type"),
-        items: ['kg', 'piece']
+        items: ['kg', 'piece', 'other']
             .map((unit) => DropdownMenuItem(value: unit, child: Text(unit)))
             .toList(),
         onChanged: (value) {

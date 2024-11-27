@@ -95,6 +95,7 @@ class _SellState extends State<Sell> {
     if (items.isEmpty) {
       return const Center(child: Text('No data found'));
     }
+    items.sort((a, b) => b.itemName!.compareTo(a.itemName ?? ''));
     return ListView.separated(
       itemCount: items.length,
       itemBuilder: (context, index) {
@@ -115,11 +116,11 @@ class _SellState extends State<Sell> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Q: ${item.quantitySold}',
+                'Q: ${item.quantitySold?.toStringAsFixed(2)}',
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               Text(
-                'TP: ${item.totalPrice}',
+                'TP: ${item.totalPrice?.toStringAsFixed(2)} tk',
                 style: Theme.of(context).textTheme.labelLarge,
               )
             ],

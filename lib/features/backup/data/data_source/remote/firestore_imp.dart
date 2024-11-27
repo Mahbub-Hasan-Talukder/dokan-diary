@@ -1,9 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dartz/dartz.dart';
-import 'package:sqflite/sqflite.dart';
-
-import '../../../../../core/database/database_helper.dart';
-import '../../../../../core/di/di.dart';
 import 'data_source.dart';
 
 class FireStoreImp implements BackupDataSource {
@@ -22,6 +17,7 @@ class FireStoreImp implements BackupDataSource {
     List<Map<String, dynamic>> items,
     String tableName,
   ) async {
+    print(items);
     CollectionReference itemsCollection = fireStore.collection(tableName);
     if (items.isEmpty) return;
     WriteBatch batch = fireStore.batch();

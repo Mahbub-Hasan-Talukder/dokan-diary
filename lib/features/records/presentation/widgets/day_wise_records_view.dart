@@ -73,14 +73,14 @@ class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
             ),
             leading: const Icon(Icons.date_range),
             subtitle: Text(
-              'Purchase: $totalPurchase',
+              'T Buy: ${totalPurchase.toStringAsFixed(2)} tk',
               style: const TextStyle(fontSize: 14),
             ),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Total sell: $totalSell',
+                  'T sell: ${totalSell.toStringAsFixed(2)} tk',
                   style: TextStyle(
                     fontSize: 16,
                     color: (totalPurchase > totalSell)
@@ -89,7 +89,7 @@ class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
                   ),
                 ),
                 Text(
-                  'Profit: ${totalSell - totalPurchase} (${percentage.toStringAsFixed(2)}%)',
+                  'Profit: ${(totalSell - totalPurchase).toStringAsFixed(2)} (${percentage.toStringAsFixed(2)}%)',
                   style: TextStyle(
                     fontSize: 14,
                     color: (totalPurchase > totalSell)
@@ -112,47 +112,53 @@ class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
   }) {
     print(widget.filterEntity.sortingOrder);
     if (widget.filterEntity.sortingOrder == SortingOrder.ascending) {
-      if ((widget.filterEntity.targetAttribute ??
-              TargetAttribute.percentage) ==
+      if ((widget.filterEntity.targetAttribute ?? TargetAttribute.percentage) ==
           TargetAttribute.percentage) {
         records.sort(
-          (a, b) => (a.percentage ?? 0).compareTo(b.percentage ?? 0,),
+          (a, b) => (a.percentage ?? 0).compareTo(
+            b.percentage ?? 0,
+          ),
         );
       }
-      if ((widget.filterEntity.targetAttribute ??
-          TargetAttribute.sell) ==
+      if ((widget.filterEntity.targetAttribute ?? TargetAttribute.sell) ==
           TargetAttribute.sell) {
         records.sort(
-              (a, b) => (a.totalSell ?? 0).compareTo(b.totalSell ?? 0,),
+          (a, b) => (a.totalSell ?? 0).compareTo(
+            b.totalSell ?? 0,
+          ),
         );
       }
-      if ((widget.filterEntity.targetAttribute ??
-          TargetAttribute.purchase) ==
+      if ((widget.filterEntity.targetAttribute ?? TargetAttribute.purchase) ==
           TargetAttribute.purchase) {
         records.sort(
-              (a, b) => (a.purchaseCost ?? 0).compareTo(b.purchaseCost ?? 0,),
+          (a, b) => (a.purchaseCost ?? 0).compareTo(
+            b.purchaseCost ?? 0,
+          ),
         );
       }
     } else {
-      if ((widget.filterEntity.targetAttribute ??
-          TargetAttribute.percentage) ==
+      if ((widget.filterEntity.targetAttribute ?? TargetAttribute.percentage) ==
           TargetAttribute.percentage) {
         records.sort(
-              (a, b) => (b.percentage ?? 0).compareTo(a.percentage ?? 0,),
+          (a, b) => (b.percentage ?? 0).compareTo(
+            a.percentage ?? 0,
+          ),
         );
       }
-      if ((widget.filterEntity.targetAttribute ??
-          TargetAttribute.sell) ==
+      if ((widget.filterEntity.targetAttribute ?? TargetAttribute.sell) ==
           TargetAttribute.sell) {
         records.sort(
-              (a, b) => (b.totalSell ?? 0).compareTo(a.totalSell ?? 0,),
+          (a, b) => (b.totalSell ?? 0).compareTo(
+            a.totalSell ?? 0,
+          ),
         );
       }
-      if ((widget.filterEntity.targetAttribute ??
-          TargetAttribute.purchase) ==
+      if ((widget.filterEntity.targetAttribute ?? TargetAttribute.purchase) ==
           TargetAttribute.purchase) {
         records.sort(
-              (a, b) => (b.purchaseCost ?? 0).compareTo(a.purchaseCost ?? 0,),
+          (a, b) => (b.purchaseCost ?? 0).compareTo(
+            a.purchaseCost ?? 0,
+          ),
         );
       }
     }
