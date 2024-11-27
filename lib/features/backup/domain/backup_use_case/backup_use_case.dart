@@ -8,6 +8,6 @@ class BackUpUseCase{
     return await backupRepository.uploadData();
   }
   Future<Either<String,String>> restoreDataUseCase()async{
-    return await backupRepository.uploadData();
+    return await backupRepository.restoreData();
   }
 }

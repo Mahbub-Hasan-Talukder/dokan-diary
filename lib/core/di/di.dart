@@ -1,6 +1,6 @@
 
-import 'package:diary/features/backup/data/data_source/data_source.dart';
-import 'package:diary/features/backup/data/data_source/firestore_imp.dart';
+import 'package:diary/features/backup/data/data_source/remote/data_source.dart';
+import 'package:diary/features/backup/data/data_source/remote/firestore_imp.dart';
 import 'package:diary/features/backup/data/repository_imp/backup_repo_imp.dart';
 import 'package:diary/features/backup/domain/backup_repo/backup_repository.dart';
 import 'package:diary/features/backup/domain/backup_use_case/backup_use_case.dart';
@@ -20,6 +20,8 @@ import 'package:diary/features/sell/presentation/cubits/fetch_items/fetch_bought
 import 'package:diary/features/sell/presentation/cubits/sell_items/sell_data_cubit.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../features/backup/data/data_source/local/local_data_source.dart';
+import '../../features/backup/data/data_source/local/sqLite_imp.dart';
 import '../../features/buy/data/data_source/data_source.dart';
 import '../../features/buy/data/data_source/data_source_imp.dart';
 import '../../features/buy/data/repository_imp/fetch_item_repo_imp.dart';
@@ -60,6 +62,7 @@ void setupLocator() {
   getIt.registerLazySingleton<FetchItemDataSource>(()=>FetchItemDataSourceImpl());
   getIt.registerLazySingleton<SellDataSource>(()=>SellDataSourceImp());
   getIt.registerLazySingleton<BackupDataSource>(()=>FireStoreImp());
+  getIt.registerLazySingleton<BackupLocalDataSource>(()=>SqLiteImp());
   getIt.registerLazySingleton<RecordsDataSource>(()=>RecordsDataSourceImp());
 
 }

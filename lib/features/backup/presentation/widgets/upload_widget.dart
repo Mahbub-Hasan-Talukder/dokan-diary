@@ -14,11 +14,11 @@ class UploadWidget extends StatefulWidget {
 
 class _UploadWidgetState extends State<UploadWidget> {
   final BackupDataCubit _backupDataCubit = getIt.get<BackupDataCubit>();
-  @override
-  void dispose() {
-    _backupDataCubit.close();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _backupDataCubit.close();
+  //   super.dispose();
+  // }
   @override
   Widget build(BuildContext context) {
     return SafeArea(

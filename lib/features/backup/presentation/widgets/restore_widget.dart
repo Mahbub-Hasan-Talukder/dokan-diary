@@ -14,11 +14,11 @@ class RestoreWidget extends StatefulWidget {
 
 class _RestoreWidgetState extends State<RestoreWidget> {
   final BackupDataCubit _backupDataCubit = getIt.get<BackupDataCubit>();
-  @override
-  void dispose() {
-    _backupDataCubit.close();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _backupDataCubit.close();
+  //   super.dispose();
+  // }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BackupDataCubit, BackupDataState>(
