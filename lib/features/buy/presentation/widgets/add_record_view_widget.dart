@@ -22,7 +22,7 @@ class AddRecordViewState extends State<AddRecordView> {
   final _formKey = GlobalKey<FormState>();
   final _itemNameController = TextEditingController();
   final _quantityController = TextEditingController();
-  final _unitPriceController = TextEditingController();
+  final _totalPriceCrontroller = TextEditingController();
   String? _selectedUnit;
   String? _selectedItem;
 
@@ -61,7 +61,7 @@ class AddRecordViewState extends State<AddRecordView> {
             children: [
               Flexible(
                 flex: 2,
-                child: numericTextField(_unitPriceController, 'total price'),
+                child: numericTextField(_totalPriceCrontroller, 'total price'),
               ),
               Flexible(
                 flex: 1,
@@ -77,15 +77,15 @@ class AddRecordViewState extends State<AddRecordView> {
               onPressed: () {
                 if (_formKey.currentState!.validate() &&
                     (double.tryParse(_quantityController.text) ?? 0) > 0) {
-                  double unitPrice =
-                      (double.tryParse(_unitPriceController.text) ?? 0) /
-                          (double.tryParse(_quantityController.text) ?? 1);
+                  double totalPrice =
+                      (double.tryParse(_totalPriceCrontroller.text) ?? 0);
+                  double? itemQuantity =
+                      double.tryParse(_quantityController.text);
                   widget.fetchItemCubit.addItems(
-                    itemName: _selectedItem ?? _itemNameController.text,
+                    itemName: _itemNameController.text,
                     unitType: _selectedUnit ?? '',
-                    unitPrice: unitPrice,
-                    itemQuantity:
-                        double.tryParse(_quantityController.text) ?? 0,
+                    unitPrice: totalPrice / (itemQuantity ?? 1),
+                    itemQuantity: itemQuantity ?? 0,
                   );
                 }
               },
@@ -157,7 +157,9 @@ class AddRecordViewState extends State<AddRecordView> {
           _selectedItem = selection.itemName ?? '';
           _itemNameController.text = selection.itemName ?? '';
           _quantityController.text = selection.quantity.toString();
-          _unitPriceController.text = selection.unitPrice.toString();
+          _totalPriceCrontroller.text =
+              ((selection.unitPrice ?? 0) * (selection.quantity ?? 0))
+                  .toString();
           _selectedUnit = selection.unitType ?? '';
         });
       },

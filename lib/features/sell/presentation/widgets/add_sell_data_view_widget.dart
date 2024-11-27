@@ -142,14 +142,13 @@ class AddRecordViewState extends State<AddSellView> {
         price > 0 &&
         existingQuantity > 0 &&
         _selectedId.isNotEmpty) {
-      double unitPrice = price / quantity;
       widget.sellDataCubit.addSellData(
         reqEntity: SellRequestEntity(
           itemId: _selectedId,
           soldQuantity: quantity,
           soldPrice: price,
           date: DateTimeFormat.getYMD(widget.dateTime.value),
-          remainingQuantity: existingQuantity-quantity,
+          remainingQuantity: existingQuantity - quantity,
         ),
       );
     }
