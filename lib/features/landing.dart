@@ -1,3 +1,4 @@
+import 'package:diary/features/backup/presentation/widgets/save_to_device.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -19,13 +20,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Diary'),
         centerTitle: true,
       ),
-      drawer:buildDrawer(),
+      drawer: buildDrawer(),
       body: SafeArea(
         child: Column(
           children: [
@@ -77,6 +77,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           UploadWidget(),
           RestoreWidget(),
+          // SaveToDeviceWidget(),
         ],
       ),
     );
@@ -91,7 +92,9 @@ class _HomePageState extends State<HomePage> {
     return StreamBuilder(
       stream: bs,
       builder: (context, snapshot) {
-        color = (snapshot.data == index) ? Theme.of(context).colorScheme.primary : Colors.grey;
+        color = (snapshot.data == index)
+            ? Theme.of(context).colorScheme.primary
+            : Colors.grey;
         return TextButton(
           onPressed: () {
             bs.add(index);

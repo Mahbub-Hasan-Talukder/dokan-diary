@@ -46,3 +46,42 @@ final class RestoreDataFailed extends BackupDataState {
   @override
   List<Object> get props => [error];
 }
+
+//device backup
+final class SaveToDeviceLoading extends BackupDataState {
+  @override
+  List<Object> get props => [];
+}
+
+final class SaveToDeviceSuccess extends BackupDataState {
+  final String successMsg;
+  const SaveToDeviceSuccess(this.successMsg);
+  @override
+  List<Object> get props => [successMsg];
+}
+
+final class SaveToDeviceFailed extends BackupDataState {
+  final String error;
+  const SaveToDeviceFailed(this.error);
+  @override
+  List<Object> get props => [error];
+}
+
+final class FetchFromDeviceLoading extends BackupDataState {
+  @override
+  List<Object> get props => [];
+}
+
+final class FetchFromDeviceSuccess extends BackupDataState {
+  final String successMsg;
+  const FetchFromDeviceSuccess(this.successMsg);
+  @override
+  List<Object> get props => [successMsg];
+}
+
+final class FetchFromDeviceFailed extends BackupDataState {
+  final String error;
+  const FetchFromDeviceFailed(this.error);
+  @override
+  List<Object> get props => [error];
+}

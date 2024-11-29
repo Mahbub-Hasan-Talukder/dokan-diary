@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:diary/features/backup/data/data_source/local/local_data_source.dart';
+import 'package:diary/features/backup/data/data_source/local/sqLite_imp.dart';
 import 'package:diary/features/backup/data/data_source/remote/data_source.dart';
 import 'package:diary/features/backup/domain/backup_repo/backup_repository.dart';
 
@@ -31,6 +34,7 @@ class BackupRepoImp implements BackupRepository {
   Future<Either<String, String>> uploadData() async {
     final sqLiteDataSource = getIt.get<BackupLocalDataSource>();
     try {
+      await _saveToDevice();
       final data = await sqLiteDataSource.fetchLocalData('Items');
       await backupDataSource.upload(data, 'Items');
       final data1 = await sqLiteDataSource.fetchLocalData('Sales');
@@ -40,5 +44,20 @@ class BackupRepoImp implements BackupRepository {
       Right(e.toString());
     }
     return Left('Success');
+  }
+
+  Future<void> _saveToDevice() async {
+    try {
+      final localDataSource = getIt.get<BackupLocalDataSource>();
+      // List<Map<String, dynamic>> itemsJson =
+      //     await localDataSource.fetchLocalData('Items');
+      // List<Map<String, dynamic>> salesJson =
+      //     await localDataSource.fetchLocalData('Sales');
+      await localDataSource.exportTablesToJson();
+
+      return;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
   }
 }

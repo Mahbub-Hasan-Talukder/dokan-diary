@@ -28,4 +28,14 @@ class BackupDataCubit extends Cubit<BackupDataState> {
       emit(RestoreDataFailed(error));
     });
   }
+
+  // void saveToDevice() async {
+  //   emit(SaveToDeviceLoading());
+  //   final result = await backUpUseCase.saveToDeviceUseCase();
+  //   result.fold((successMsg) {
+  //     emit(SaveToDeviceSuccess(successMsg));
+  //   }, (error) {
+  //     emit(SaveToDeviceFailed(error));
+  //   });
+  // }
 }
