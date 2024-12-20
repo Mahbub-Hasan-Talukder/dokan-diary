@@ -1,3 +1,4 @@
+import 'package:diary/features/buy/data/data_source/data_source_imp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -25,6 +26,9 @@ class AddRecordViewState extends State<AddRecordView> {
   final _totalPriceCrontroller = TextEditingController();
   String? _selectedUnit;
   String? _selectedItem;
+  String? _selectedId;
+  double quantityHintValue = 0;
+  double priceHintValue = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -50,52 +54,122 @@ class AddRecordViewState extends State<AddRecordView> {
                 child: itemNameInput(),
               ),
               const SizedBox(height: 10),
-              Flexible(
-                flex: 1,
-                child: numericTextField(_quantityController, 'quantity'),
-              ),
             ],
           ),
           const SizedBox(height: 5),
           Row(
             children: [
               Flexible(
-                flex: 2,
-                child: numericTextField(_totalPriceCrontroller, 'total price'),
+                flex: 1,
+                child: numericTextField(
+                    _quantityController,
+                    quantityHintValue == 0
+                        ? 'Quantity'
+                        : quantityHintValue.toString(),
+                    'Quantity'),
               ),
               Flexible(
                 flex: 1,
-                child: dropdownField(),
+                child: numericTextField(
+                    _totalPriceCrontroller,
+                    priceHintValue == 0
+                        ? 'Total price'
+                        : 'unit price: $priceHintValue',
+                    'Total Price'),
               ),
+              // Flexible(
+              //   flex: 1,
+              //   child: dropdownField(),
+              // ),
             ],
           ),
           const SizedBox(height: 5),
-          SizedBox(
-            width: double.infinity,
-            height: 60,
-            child: ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate() &&
-                    (double.tryParse(_quantityController.text) ?? 0) > 0) {
-                  double totalPrice =
-                      (double.tryParse(_totalPriceCrontroller.text) ?? 0);
-                  double? itemQuantity =
-                      double.tryParse(_quantityController.text);
-                  widget.fetchItemCubit.addItems(
-                    itemName: _itemNameController.text,
-                    unitType: _selectedUnit ?? '',
-                    unitPrice: totalPrice / (itemQuantity ?? 1),
-                    itemQuantity: itemQuantity ?? 0,
-                  );
-                }
-              },
-              child: Text(
-                'Add',
-                style: Theme.of(context).textTheme.displayLarge,
-              ),
-            ),
-          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _delete(context),
+              _add(context),
+              _edit(context),
+            ],
+          )
         ],
+      ),
+    );
+  }
+
+  SizedBox _add(BuildContext context) {
+    return SizedBox(
+      width: 100,
+      height: 60,
+      child: ElevatedButton(
+        onPressed: () {
+          if (_formKey.currentState!.validate() &&
+              (double.tryParse(_quantityController.text) ?? 0) > 0) {
+            double totalPrice =
+                (double.tryParse(_totalPriceCrontroller.text) ?? 0);
+            double? itemQuantity = double.tryParse(_quantityController.text);
+            widget.fetchItemCubit.addItems(
+              itemName: _itemNameController.text,
+              unitType: 'kg',
+              unitPrice: totalPrice / (itemQuantity ?? 1),
+              itemQuantity: itemQuantity ?? 0,
+            );
+          }
+        },
+        child: Text(
+          'Add',
+          style: Theme.of(context).textTheme.displayLarge,
+        ),
+      ),
+    );
+  }
+
+  SizedBox _edit(BuildContext context) {
+    return SizedBox(
+      width: 100,
+      height: 60,
+      child: ElevatedButton(
+        onPressed: () {
+          if (_formKey.currentState!.validate() &&
+              (double.tryParse(_quantityController.text) ?? 0) > 0 &&
+              _selectedId != null) {
+            double totalPrice =
+                (double.tryParse(_totalPriceCrontroller.text) ?? 0);
+            double? itemQuantity = double.tryParse(_quantityController.text);
+            double unitPrice = totalPrice / (itemQuantity ?? 1);
+            Future(() async {
+              await FetchItemDataSourceImpl().updateItem(
+                itemId: _selectedId ?? '',
+                unitPrice: unitPrice,
+                quantity: itemQuantity ?? 0,
+              );
+              widget.fetchItemCubit.fetchItems();
+            });
+          } else {
+            print('dbg not entered');
+          }
+        },
+        child: Text(
+          'Edit',
+          style: Theme.of(context).textTheme.displayLarge,
+        ),
+      ),
+    );
+  }
+
+  SizedBox _delete(BuildContext context) {
+    return SizedBox(
+      width: 100,
+      height: 60,
+      child: ElevatedButton(
+        onPressed: () {
+          widget.fetchItemCubit
+              .deleteItem(itemId: _selectedId ?? '', price: '');
+        },
+        child: Text(
+          'delete',
+          style: Theme.of(context).textTheme.displayLarge,
+        ),
       ),
     );
   }
@@ -103,6 +177,7 @@ class AddRecordViewState extends State<AddRecordView> {
   Widget numericTextField(
     TextEditingController controller,
     String hintText,
+    String label,
   ) {
     return TextFormField(
       controller: controller,
@@ -112,7 +187,7 @@ class AddRecordViewState extends State<AddRecordView> {
           borderRadius: BorderRadius.circular(10),
         ),
         hintText: hintText,
-        labelText: hintText,
+        labelText: label,
       ),
       keyboardType: TextInputType.number,
       // inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -155,12 +230,15 @@ class AddRecordViewState extends State<AddRecordView> {
       onSelected: (ItemEntity selection) {
         setState(() {
           _selectedItem = selection.itemName ?? '';
+          _selectedId = selection.id ?? '';
           _itemNameController.text = selection.itemName ?? '';
           _quantityController.text = selection.quantity.toString();
           _totalPriceCrontroller.text =
               ((selection.unitPrice ?? 0) * (selection.quantity ?? 0))
                   .toString();
           _selectedUnit = selection.unitType ?? '';
+          quantityHintValue = selection.quantity ?? 0;
+          priceHintValue = selection.unitPrice ?? 0;
         });
       },
       fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {

@@ -37,6 +37,7 @@ class AddRecordViewState extends State<AddSellView> {
   final FetchBoughtItemsCubit _fetchBoughtItemsCubit =
       getIt.get<FetchBoughtItemsCubit>();
   String _selectedId = '';
+  double dynamicQuantity = 0;
 
   @override
   void initState() {
@@ -97,14 +98,19 @@ class AddRecordViewState extends State<AddSellView> {
           const SizedBox(height: 5),
           Row(
             children: [
-              Flexible(
-                flex: 2,
-                child: numericTextField(_priceController, 'price'),
-              ),
               const SizedBox(height: 10),
               Flexible(
                 flex: 1,
-                child: numericTextField(_quantityController, 'quantity'),
+                child: numericTextField(
+                  _quantityController,
+                  (dynamicQuantity == 0)
+                      ? 'quantity'
+                      : dynamicQuantity.toString(),
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: numericTextField(_priceController, 'price'),
               ),
             ],
           ),
@@ -158,6 +164,7 @@ class AddRecordViewState extends State<AddSellView> {
     TextEditingController controller,
     String hintText,
   ) {
+    controller.text = '';
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
@@ -187,9 +194,12 @@ class AddRecordViewState extends State<AddSellView> {
       },
       displayStringForOption: (FetchItemEntity option) => option.itemId ?? '',
       onSelected: (FetchItemEntity selection) {
-        _itemNameController.text = selection.itemId ?? '';
-        _quantityController.text = selection.quantity.toString();
-        _selectedId = selection.itemId ?? '';
+        setState(() {
+          _itemNameController.text = selection.itemId ?? '';
+          _quantityController.text = selection.quantity.toString();
+          dynamicQuantity = selection.quantity ?? 0;
+          _selectedId = selection.itemId ?? '';
+        });
       },
       fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
         _itemNameController.addListener(() {

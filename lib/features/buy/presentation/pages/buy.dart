@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,16 +15,19 @@ class Buy extends StatefulWidget {
 
 class _BuyState extends State<Buy> {
   final FetchItemCubit _fetchItemCubit = getIt.get<FetchItemCubit>();
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     _fetchItemCubit.fetchItems();
+    _scrollController = ScrollController();
     super.initState();
   }
 
   @override
   void dispose() {
-    _fetchItemCubit;
+    _fetchItemCubit.close();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -42,7 +46,9 @@ class _BuyState extends State<Buy> {
                   children: [
                     Center(child: Text("Total items: ${state.items.length}")),
                     const Divider(color: Colors.grey),
-                    Expanded(child: buildListView(state)),
+                    Expanded(
+                      child: buildListView(state),
+                    ),
                     AddRecordView(
                       items: state.items,
                       fetchItemCubit: _fetchItemCubit,
@@ -84,35 +90,43 @@ class _BuyState extends State<Buy> {
 
     items.sort((a, b) => a.itemName!.compareTo(b.itemName ?? ''));
 
-    return ListView.separated(
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return ListTile(
-          tileColor: Colors.grey.shade300,
-          leading: const Icon(Icons.hardware),
-          title: Text(item.itemName ?? 'N/A'),
-          subtitle: Text('Unit P: ${item.unitPrice?.toStringAsFixed(2)} tk'),
-          trailing: Text(
-            '${item.quantity?.toStringAsFixed(2)}\n${item.unitType}',
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
-          onLongPress: () {
-            Scaffold.of(context).showBottomSheet(
-              (context) {
-                return modalSheetView(
-                  context,
-                  item.id ?? 'N/A',
-                  item.unitPrice.toString(),
-                );
-              },
-            );
-          },
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) {
-        return const SizedBox(height: 5);
-      },
+    return RawScrollbar(
+      controller: _scrollController,
+      thickness: 10,
+      thumbColor: Colors.grey.shade700,
+      thumbVisibility: true,
+      interactive: true,
+      child: ListView.separated(
+        controller: _scrollController,
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return ListTile(
+            tileColor: Colors.grey.shade300,
+            leading: const Icon(Icons.hardware),
+            title: Text(item.itemName ?? 'N/A'),
+            subtitle: Text('Unit P: ${item.unitPrice?.toStringAsFixed(2)} tk'),
+            trailing: Text(
+              '${item.quantity?.toStringAsFixed(2)}\n units',
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            onLongPress: () {
+              Scaffold.of(context).showBottomSheet(
+                (context) {
+                  return modalSheetView(
+                    context,
+                    item.id ?? 'N/A',
+                    item.unitPrice.toString(),
+                  );
+                },
+              );
+            },
+          );
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          return const SizedBox(height: 5);
+        },
+      ),
     );
   }
 

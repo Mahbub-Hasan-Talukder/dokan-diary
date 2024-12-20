@@ -49,9 +49,9 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
   }
 
   @override
-  Future<bool>doesItemExist({required String itemId})async {
+  Future<bool> doesItemExist({required String itemId}) async {
     _db ??= await dbHelper.database;
-    if(_db!=null){
+    if (_db != null) {
       final result = await _db!.query(
         'Items',
         where: 'item_id = ?',
@@ -63,9 +63,9 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
   }
 
   @override
-  Future<List<Map<String, Object?>>> getItem({required String itemId}) async{
+  Future<List<Map<String, Object?>>> getItem({required String itemId}) async {
     _db ??= await dbHelper.database;
-    if(_db!=null){
+    if (_db != null) {
       final result = await _db!.query(
         'Items',
         where: 'item_id = ?',
@@ -76,5 +76,29 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
     throw Exception('Database instance not created');
   }
 
+  Future<void> updateItem({
+    required String itemId,
+    required double unitPrice,
+    required double quantity,
+  }) async {
+    // Get the database instance
 
+    _db ??= await dbHelper.database;
+
+    // Execute the update query
+    await _db!.rawUpdate(
+      '''
+    UPDATE Items
+    SET 
+      item_unit_price = ?, 
+      item_quantity = ?
+    WHERE 
+      item_id = ?;
+    ''',
+      [unitPrice, quantity, itemId], // Bind the values here
+    );
+
+    // Optionally, log the number of rows updated
+    // print('$count record(s) updated in Items table');
+  }
 }

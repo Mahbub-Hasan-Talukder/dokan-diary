@@ -39,24 +39,27 @@ class _RecordsState extends State<Records> {
         builder: (context, snapshot) {
           return Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  buildFilterButton(
-                    queryInput: QueryTypes.calender,
-                    label: 'By Date',
-                    context: context,
-                    isActive: QueryTypes.calender ==
-                        (snapshot.data?.queryType ?? QueryTypes.calender),
-                  ),
-                  buildFilterButton(
-                    queryInput: QueryTypes.item,
-                    label: 'By Product',
-                    context: context,
-                    isActive: QueryTypes.item ==
-                        (snapshot.data?.queryType ?? QueryTypes.item),
-                  ),
-                ],
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    buildFilterButton(
+                      queryInput: QueryTypes.calender,
+                      label: 'By Date',
+                      context: context,
+                      isActive: QueryTypes.calender ==
+                          (snapshot.data?.queryType ?? QueryTypes.calender),
+                    ),
+                    buildFilterButton(
+                      queryInput: QueryTypes.item,
+                      label: 'By Product',
+                      context: context,
+                      isActive: QueryTypes.item ==
+                          (snapshot.data?.queryType ?? QueryTypes.item),
+                    ),
+                  ],
+                ),
               ),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
                 filterButton(

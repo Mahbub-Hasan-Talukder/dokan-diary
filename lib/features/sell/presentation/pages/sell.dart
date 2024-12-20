@@ -1,5 +1,6 @@
 import 'package:diary/core/services/date_time_format.dart';
 import 'package:diary/features/sell/presentation/widgets/add_sell_data_view_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -22,6 +23,7 @@ class _SellState extends State<Sell> {
   UndoRecordCubit _undoRecordCubit = getIt.get<UndoRecordCubit>();
   final BehaviorSubject<DateTime> dateStream =
       BehaviorSubject.seeded(DateTime.now());
+  late ScrollController _scrollController;
 
   @override
   void dispose() {
@@ -33,6 +35,7 @@ class _SellState extends State<Sell> {
   @override
   void initState() {
     _sellDataCubit.fetchSellData(date: dateStream.value);
+    _scrollController = ScrollController();
     super.initState();
   }
 
@@ -95,56 +98,61 @@ class _SellState extends State<Sell> {
     if (items.isEmpty) {
       return const Center(child: Text('No data found'));
     }
-    return ListView.separated(
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return ListTile(
-          tileColor: Colors.grey.shade300,
-          leading: const Icon(Icons.hardware),
-          title: Text(item.itemName ?? 'N/A'),
-          subtitle: Text(
-            'Profit: ${item.profit?.toStringAsFixed(2)} tk',
-            style: TextStyle(
-              color: ((item.profit ?? 0) < 0)
-                  ? Colors.red.shade800
-                  : Colors.green.shade800,
-            ),
-          ),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Q: ${item.quantitySold?.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.labelLarge,
+    return CupertinoScrollbar(
+      controller: _scrollController,
+      thickness: 10,
+      thumbVisibility: true,
+      child: ListView.separated(
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return ListTile(
+            tileColor: Colors.grey.shade300,
+            leading: const Icon(Icons.hardware),
+            title: Text(item.itemName ?? 'N/A'),
+            subtitle: Text(
+              'Profit: ${item.profit?.toStringAsFixed(2)} tk',
+              style: TextStyle(
+                color: ((item.profit ?? 0) < 0)
+                    ? Colors.red.shade800
+                    : Colors.green.shade800,
               ),
-              Text(
-                'TP: ${item.totalPrice?.toStringAsFixed(2)} tk',
-                style: Theme.of(context).textTheme.labelLarge,
-              )
-            ],
-          ),
-          onLongPress: () {
-            if (item.saleId != null &&
-                item.quantitySold != null &&
-                item.itemId != null) {
-              Scaffold.of(context).showBottomSheet(
-                (context) {
-                  return modalSheetView(
-                    context: context,
-                    saleId: item.saleId!,
-                    quantitySold: item.quantitySold!,
-                    itemId: item.itemId!,
-                  );
-                },
-              );
-            }
-          },
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) {
-        return const SizedBox(height: 5);
-      },
+            ),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Q: ${item.quantitySold?.toStringAsFixed(2)}',
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+                Text(
+                  'TP: ${item.totalPrice?.toStringAsFixed(2)} tk',
+                  style: Theme.of(context).textTheme.labelLarge,
+                )
+              ],
+            ),
+            onLongPress: () {
+              if (item.saleId != null &&
+                  item.quantitySold != null &&
+                  item.itemId != null) {
+                Scaffold.of(context).showBottomSheet(
+                  (context) {
+                    return modalSheetView(
+                      context: context,
+                      saleId: item.saleId!,
+                      quantitySold: item.quantitySold!,
+                      itemId: item.itemId!,
+                    );
+                  },
+                );
+              }
+            },
+          );
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          return const SizedBox(height: 5);
+        },
+      ),
     );
   }
 

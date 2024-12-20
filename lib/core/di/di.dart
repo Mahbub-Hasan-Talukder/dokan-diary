@@ -1,4 +1,3 @@
-
 import 'package:diary/features/backup/data/data_source/remote/data_source.dart';
 import 'package:diary/features/backup/data/data_source/remote/firestore_imp.dart';
 import 'package:diary/features/backup/data/repository_imp/backup_repo_imp.dart';
@@ -36,33 +35,40 @@ final getIt = GetIt.instance;
 
 void setupLocator() {
   getIt.registerLazySingleton<DatabaseHelper>(() => DatabaseHelper());
-  
+
   //cubits
-  getIt.registerFactory(()=>FetchItemCubit(getIt.call()));
-  getIt.registerFactory(()=>SellDataCubit(getIt.call()));
-  getIt.registerFactory(()=>FetchBoughtItemsCubit(getIt.call()));
-  getIt.registerFactory(()=>BackupDataCubit(getIt.call()));
-  getIt.registerFactory(()=>UndoRecordCubit(getIt.call()));
-  getIt.registerFactory(()=>DayWiseCubit(getIt.call()));
-  getIt.registerFactory(()=>ItemWiseCubit(getIt.call()));
+  getIt.registerLazySingleton(() => FetchItemCubit(getIt.call()));
+  getIt.registerFactory(() => SellDataCubit(getIt.call()));
+  getIt.registerFactory(() => FetchBoughtItemsCubit(getIt.call()));
+  getIt.registerFactory(() => BackupDataCubit(getIt.call()));
+  getIt.registerFactory(() => UndoRecordCubit(getIt.call()));
+  getIt.registerFactory(() => DayWiseCubit(getIt.call()));
+  getIt.registerFactory(() => ItemWiseCubit(getIt.call()));
 
   //use case
-  getIt.registerLazySingleton<FetchItemUseCase>(()=>FetchItemUseCase(getIt.call()));
-  getIt.registerLazySingleton<SellDataUseCase>(()=>SellDataUseCase(getIt.call()));
-  getIt.registerLazySingleton<BackUpUseCase>(()=>BackUpUseCase(getIt.call()));
-  getIt.registerLazySingleton<RecordsUseCases>(()=>RecordsUseCases(getIt.call()));
+  getIt.registerLazySingleton<FetchItemUseCase>(
+      () => FetchItemUseCase(getIt.call()));
+  getIt.registerLazySingleton<SellDataUseCase>(
+      () => SellDataUseCase(getIt.call()));
+  getIt.registerLazySingleton<BackUpUseCase>(() => BackUpUseCase(getIt.call()));
+  getIt.registerLazySingleton<RecordsUseCases>(
+      () => RecordsUseCases(getIt.call()));
 
   //repository
-  getIt.registerLazySingleton<FetchItemRepo>(()=>FetchItemRepoImp(getIt.call()));
-  getIt.registerLazySingleton<SellDataRepo>(()=>SellDataRepoImp(getIt.call()));
-  getIt.registerLazySingleton<BackupRepository>(()=>BackupRepoImp(getIt.call()));
-  getIt.registerLazySingleton<RecordsRepository>(()=>RecordsRepositoryImp(getIt.call()));
+  getIt.registerLazySingleton<FetchItemRepo>(
+      () => FetchItemRepoImp(getIt.call()));
+  getIt
+      .registerLazySingleton<SellDataRepo>(() => SellDataRepoImp(getIt.call()));
+  getIt.registerLazySingleton<BackupRepository>(
+      () => BackupRepoImp(getIt.call()));
+  getIt.registerLazySingleton<RecordsRepository>(
+      () => RecordsRepositoryImp(getIt.call()));
 
   //data source
-  getIt.registerLazySingleton<FetchItemDataSource>(()=>FetchItemDataSourceImpl());
-  getIt.registerLazySingleton<SellDataSource>(()=>SellDataSourceImp());
-  getIt.registerLazySingleton<BackupDataSource>(()=>FireStoreImp());
-  getIt.registerLazySingleton<BackupLocalDataSource>(()=>SqLiteImp());
-  getIt.registerLazySingleton<RecordsDataSource>(()=>RecordsDataSourceImp());
-
+  getIt.registerLazySingleton<FetchItemDataSource>(
+      () => FetchItemDataSourceImpl());
+  getIt.registerLazySingleton<SellDataSource>(() => SellDataSourceImp());
+  getIt.registerLazySingleton<BackupDataSource>(() => FireStoreImp());
+  getIt.registerLazySingleton<BackupLocalDataSource>(() => SqLiteImp());
+  getIt.registerLazySingleton<RecordsDataSource>(() => RecordsDataSourceImp());
 }

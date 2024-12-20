@@ -1,4 +1,5 @@
 import 'package:diary/features/backup/presentation/cubit/backup_data_cubit.dart';
+import 'package:diary/features/buy/presentation/cubits/fetch_items/fetch_item_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -31,6 +32,7 @@ class _RestoreWidgetState extends State<RestoreWidget> {
           );
         }
         if (state is RestoreDataSuccess) {
+          getIt.get<FetchItemCubit>().fetchItems();
           WidgetsBinding.instance.addPostFrameCallback((t) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
