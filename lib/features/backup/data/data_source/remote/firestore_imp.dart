@@ -68,9 +68,7 @@ class FireStoreImp implements BackupDataSource {
       for (QueryDocumentSnapshot doc in querySnapshot.docs) {
         await doc.reference.delete();
       }
-      print('dbg Collection $collectionName deleted successfully.');
     } catch (e) {
-      print('dbg ${e.toString()}');
       throw Exception(e.toString());
     }
   }

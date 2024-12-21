@@ -39,7 +39,7 @@ class FetchItemRepoImp implements FetchItemRepo {
         double fetchedQuantity = fetchedEntity.quantity ?? 0;
         double newQuantity = inputQuantity + fetchedQuantity;
         double newUnitPrice = (inputUnitPrice * inputQuantity +
-            fetchedUnitPrice * fetchedQuantity) /
+                fetchedUnitPrice * fetchedQuantity) /
             newQuantity;
         entity.quantity = newQuantity;
         entity.unitPrice = newUnitPrice.floorToDouble();

@@ -26,7 +26,9 @@ class _BuyState extends State<Buy> {
 
   @override
   void dispose() {
-    _fetchItemCubit.close();
+    if (!mounted) {
+      _fetchItemCubit.close();
+    }
     _scrollController.dispose();
     super.dispose();
   }

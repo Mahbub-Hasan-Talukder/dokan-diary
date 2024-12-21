@@ -145,9 +145,7 @@ class AddRecordViewState extends State<AddRecordView> {
               );
               widget.fetchItemCubit.fetchItems();
             });
-          } else {
-            print('dbg not entered');
-          }
+          } else {}
         },
         child: Text(
           'Edit',
