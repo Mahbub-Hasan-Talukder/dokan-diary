@@ -24,7 +24,10 @@ class _DeleteWidgetState extends State<DeleteWidget> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: const Text('Delete Data'),
+              title: const Text(
+                'Delete Data',
+                style: TextStyle(color: Colors.red),
+              ),
               content: const Text('Are you sure you want to delete your data?'),
               actions: [
                 TextButton(
@@ -39,7 +42,10 @@ class _DeleteWidgetState extends State<DeleteWidget> {
                     _itemCubit.fetchItems();
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Yes'),
+                  child: const Text(
+                    'Yes',
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
               ],
             );

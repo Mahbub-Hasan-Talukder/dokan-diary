@@ -59,10 +59,14 @@ class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
       child: ListView.builder(
         itemCount: records.length,
         itemBuilder: (context, index) {
+          if (records[index].date == '' || records[index].date == null) {
+            return const SizedBox.shrink();
+          }
+          String date = records[index].date!;
           double totalSell = records[index].totalSell ?? 0;
           double totalPurchase = records[index].purchaseCost ?? 0;
-          String date = records[index].date ?? DateTime.now().toIso8601String();
           double percentage = records[index].percentage ?? 0;
+
           return ListTile(
             title: Text(
               DateTimeFormat.getPrettyDate(

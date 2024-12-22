@@ -64,9 +64,8 @@ class SqLiteImp implements BackupLocalDataSource {
       if (_db == null) return;
       for (var snapshot in snapshots.docs) {
         final data = snapshot.data();
-
         // Extract values from the snapshot
-        final itemId = int.tryParse(data['item_id']) ?? 0;
+        final itemId = data['item_id'] ?? 0;
         final quantitySold = data['quantity_sold'] ?? '';
         final saleDate = data['sale_date'] ?? '';
         final saleId = data['sale_id'] ?? 0.0;
@@ -115,12 +114,7 @@ class SqLiteImp implements BackupLocalDataSource {
       // Write JSON data to files
       await itemsFile.writeAsString(itemsJson);
       await salesFile.writeAsString(salesJson);
-
-      // print('Data exported successfully:');
-      // print('Items saved to: ${itemsFile.path}');
-      // print('Sales saved to: ${salesFile.path}');
     } catch (e) {
-      // print('Error exporting data: $e');
       throw Exception(e.toString());
     }
   }

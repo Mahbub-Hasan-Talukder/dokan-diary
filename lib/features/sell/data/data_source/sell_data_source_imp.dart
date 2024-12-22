@@ -17,11 +17,12 @@ class SellDataSourceImp implements SellDataSource {
       // await _db!.rawDelete('DELETE FROM Sales;');
       // await _db!.rawDelete('DELETE FROM Items;');
       final result = await _db!.rawQuery('''
-        SELECT i.item_name, i.item_id, i.item_unit_price, s.sale_id, s.sale_date, s.quantity_sold, s.total_price
+        SELECT *
         FROM Sales s JOIN Items i 
         ON s.item_id = i.item_id
         WHERE s.sale_date = ?;
       ''', [saleDate]);
+
       return result;
     }
     throw Exception('Database instance not created');
