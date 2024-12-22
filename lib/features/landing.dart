@@ -1,3 +1,4 @@
+import 'package:diary/features/backup/presentation/widgets/delete_data.dart';
 import 'package:diary/features/backup/presentation/widgets/save_to_device.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -124,6 +125,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           UploadWidget(),
           RestoreWidget(),
+          DeleteWidget(),
           // SaveToDeviceWidget(),
         ],
       ),

@@ -26,11 +26,7 @@ class _UploadWidgetState extends State<UploadWidget> {
         bloc: _backupDataCubit,
         builder: (context, state) {
           if (state is UploadDataLoading) {
-            return const SizedBox(
-              height: 10,
-              width: 10,
-              child: CircularProgressIndicator(),
-            );
+            return const CircularProgressIndicator();
           }
           if (state is UploadDataSuccess) {
             WidgetsBinding.instance.addPostFrameCallback((t) {
@@ -54,7 +50,30 @@ class _UploadWidgetState extends State<UploadWidget> {
           }
           return ElevatedButton(
             onPressed: () {
-              _backupDataCubit.uploadData();
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Upload Data'),
+                      content:
+                          const Text('Are you sure you want to upload data?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('No'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _backupDataCubit.uploadData();
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Yes'),
+                        ),
+                      ],
+                    );
+                  });
             },
             style: ButtonStyle(
               backgroundColor: WidgetStatePropertyAll(

@@ -45,7 +45,7 @@ class FetchItemCubit extends Cubit<FetchItemState> {
     });
   }
 
-  void deleteItem({required String itemId, required String price}) async {
+  void deleteItem({required String itemId, String? price}) async {
     final result = await fetchItemUseCase.delete(itemId: itemId);
     result.fold((success) {
       emit(DeleteItemSuccess(success: success));

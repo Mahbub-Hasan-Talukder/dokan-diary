@@ -20,7 +20,7 @@ class Sell extends StatefulWidget {
 
 class _SellState extends State<Sell> {
   final SellDataCubit _sellDataCubit = getIt.get<SellDataCubit>();
-  UndoRecordCubit _undoRecordCubit = getIt.get<UndoRecordCubit>();
+  final UndoRecordCubit _undoRecordCubit = getIt.get<UndoRecordCubit>();
   final BehaviorSubject<DateTime> dateStream =
       BehaviorSubject.seeded(DateTime.now());
   late ScrollController _scrollController;
@@ -84,7 +84,7 @@ class _SellState extends State<Sell> {
       onPressed: () async {
         final DateTime? pickedDate = await showDatePicker(
           context: context,
-          initialDate: DateTime.now(),
+          initialDate: dateStream.value,
           firstDate: DateTime(2000),
           lastDate: DateTime(2100),
         );
@@ -98,11 +98,14 @@ class _SellState extends State<Sell> {
     if (items.isEmpty) {
       return const Center(child: Text('No data found'));
     }
-    return CupertinoScrollbar(
+    return RawScrollbar(
       controller: _scrollController,
       thickness: 10,
+      thumbColor: Colors.grey.shade700,
       thumbVisibility: true,
+      interactive: true,
       child: ListView.separated(
+        controller: _scrollController,
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];

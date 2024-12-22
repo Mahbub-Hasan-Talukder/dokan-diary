@@ -138,10 +138,17 @@ class AddRecordViewState extends State<AddRecordView> {
             double? itemQuantity = double.tryParse(_quantityController.text);
             double unitPrice = totalPrice / (itemQuantity ?? 1);
             Future(() async {
-              await FetchItemDataSourceImpl().updateItem(
-                itemId: _selectedId ?? '',
+              // await FetchItemDataSourceImpl().updateItem(
+              //   itemId: _selectedId ?? '',
+              //   unitPrice: unitPrice,
+              //   quantity: itemQuantity ?? 0,
+              // );
+              widget.fetchItemCubit.deleteItem(itemId: _selectedId ?? '');
+              widget.fetchItemCubit.addItems(
+                itemName: _itemNameController.text,
+                unitType: 'kg',
                 unitPrice: unitPrice,
-                quantity: itemQuantity ?? 0,
+                itemQuantity: itemQuantity ?? 0,
               );
               widget.fetchItemCubit.fetchItems();
             });

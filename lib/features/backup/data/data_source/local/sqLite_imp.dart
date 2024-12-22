@@ -62,7 +62,6 @@ class SqLiteImp implements BackupLocalDataSource {
       _db ??= await dbHelper.database;
 
       if (_db == null) return;
-
       for (var snapshot in snapshots.docs) {
         final data = snapshot.data();
 
@@ -86,7 +85,6 @@ class SqLiteImp implements BackupLocalDataSource {
         ]);
       }
     } catch (e) {
-      // print('dbg: exc: ${e.toString()}');
       throw Exception(e.toString());
     }
   }
@@ -123,6 +121,17 @@ class SqLiteImp implements BackupLocalDataSource {
       // print('Sales saved to: ${salesFile.path}');
     } catch (e) {
       // print('Error exporting data: $e');
+      throw Exception(e.toString());
+    }
+  }
+
+  void instantDelete() async {
+    try {
+      _db ??= await dbHelper.database;
+      if (_db == null) return;
+      await _db!.rawDelete('DELETE FROM Sales;');
+      await _db!.rawDelete('DELETE FROM Items;');
+    } catch (e) {
       throw Exception(e.toString());
     }
   }

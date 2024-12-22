@@ -25,11 +25,7 @@ class _RestoreWidgetState extends State<RestoreWidget> {
       bloc: _backupDataCubit,
       builder: (context, state) {
         if (state is RestoreDataLoading) {
-          return const SizedBox(
-            height: 10,
-            width: 10,
-            child: CircularProgressIndicator(),
-          );
+          return const CircularProgressIndicator();
         }
         if (state is RestoreDataSuccess) {
           getIt.get<FetchItemCubit>().fetchItems();
@@ -54,7 +50,30 @@ class _RestoreWidgetState extends State<RestoreWidget> {
         }
         return ElevatedButton(
           onPressed: () {
-            _backupDataCubit.restoreData();
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Restore Data'),
+                    content: const Text(
+                        'Are you sure you want to restore your data?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('No'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          _backupDataCubit.restoreData();
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Yes'),
+                      ),
+                    ],
+                  );
+                });
           },
           style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(

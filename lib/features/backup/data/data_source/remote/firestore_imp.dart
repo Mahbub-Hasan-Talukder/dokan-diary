@@ -75,17 +75,17 @@ class FireStoreImp implements BackupDataSource {
 
   List<Map<String, dynamic>> items1 = [
     {
-      "item_id": "car hati blue poli_14.97",
+      "item_id": "car hati blue poli_149.71",
       "item_name": "car hati blue poli",
       "item_quantity": 16.915,
-      "item_unit_price": 14.9727937,
+      "item_unit_price": 149.7127937,
       "item_unit_type": "kg"
     },
     {
-      "item_id": "car hati gray poli_19.22",
+      "item_id": "car hati gray poli_192.23",
       "item_name": "car hati gray poli",
       "item_quantity": 12.07,
-      "item_unit_price": 19.22380952,
+      "item_unit_price": 192.2380952,
       "item_unit_type": "kg"
     },
     {
@@ -588,14 +588,14 @@ class FireStoreImp implements BackupDataSource {
     {
       "item_id": "patam_107.63",
       "item_name": "patam",
-      "item_quantity": 28,
+      "item_quantity": 5.11,
       "item_unit_price": 107.6320939,
       "item_unit_type": "kg"
     },
     {
       "item_id": "pathor cun_18.93",
       "item_name": "pathor cun",
-      "item_quantity": 11,
+      "item_quantity": 28,
       "item_unit_price": 18.92857143,
       "item_unit_type": "kg"
     },
@@ -1230,29 +1230,29 @@ class FireStoreImp implements BackupDataSource {
       "item_unit_type": "kg"
     },
     {
-      "item_id": "boltu 2 suta 5\"_160.00",
-      "item_name": "boltu 2 suta 5\"",
+      "item_id": "boltu 2 suta 0.5\"_160.00",
+      "item_name": "boltu 2 suta 0.5\"",
       "item_quantity": 0,
       "item_unit_price": 160,
       "item_unit_type": "kg"
     },
     {
-      "item_id": "boltu 2 suta 1\"_145.00",
+      "item_id": "boltu 2 suta 1\"_150.00",
       "item_name": "boltu 2 suta 1\"",
       "item_quantity": 2,
-      "item_unit_price": 145,
-      "item_unit_type": "kg"
-    },
-    {
-      "item_id": "boltu 2 suta 1.5\", 2\", 4\"_150.00",
-      "item_name": "boltu 2 suta 1.5\", 2\", 4\"",
-      "item_quantity": 6,
       "item_unit_price": 150,
       "item_unit_type": "kg"
     },
     {
-      "item_id": "boltu 2.5 suta 5\"_160.00",
-      "item_name": "boltu 2.5 suta 5\"",
+      "item_id": "boltu 2 suta 1.5\", 2\", 4\"_145.00",
+      "item_name": "boltu 2 suta 1.5\", 2\", 4\"",
+      "item_quantity": 6,
+      "item_unit_price": 145,
+      "item_unit_type": "kg"
+    },
+    {
+      "item_id": "boltu 2.5 suta 0.5\"_160.00",
+      "item_name": "boltu 2.5 suta 0.5\"",
       "item_quantity": 3,
       "item_unit_price": 160,
       "item_unit_type": "kg"
@@ -1293,17 +1293,17 @@ class FireStoreImp implements BackupDataSource {
       "item_unit_type": "kg"
     },
     {
-      "item_id": "boltu 3 suta 5\"_112.00",
+      "item_id": "boltu 3 suta 5\"_111.00",
       "item_name": "boltu 3 suta 5\"",
       "item_quantity": 43.77625,
-      "item_unit_price": 112,
+      "item_unit_price": 111,
       "item_unit_type": "kg"
     },
     {
-      "item_id": "boltu 3 suta 6\", 7\", 8\", 9\", 10\"_111.00",
+      "item_id": "boltu 3 suta 6\", 7\", 8\", 9\", 10\"_112.00",
       "item_name": "boltu 3 suta 6\", 7\", 8\", 9\", 10\"",
       "item_quantity": 68.33125,
-      "item_unit_price": 111,
+      "item_unit_price": 112,
       "item_unit_type": "kg"
     },
     {
