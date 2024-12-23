@@ -17,11 +17,10 @@ class FireStoreImp implements BackupDataSource {
     String tableName,
   ) async {
     CollectionReference itemsCollection = fireStore.collection(tableName);
-    if (items.isEmpty) throw Exception('No data to upload');
+    // if (items.isEmpty) throw Exception('No data to upload');
 
     try {
       WriteBatch batch = fireStore.batch();
-
       for (Map<String, dynamic> item in items) {
         String docId = tableName == 'Items'
             ? item['item_id'].replaceAll('/', '-')

@@ -35,8 +35,11 @@ class BackupRepoImp implements BackupRepository {
     final sqLiteDataSource = getIt.get<BackupLocalDataSource>();
     try {
       await _saveToDevice();
+      print('before fetchLocalData');
       final data = await sqLiteDataSource.fetchLocalData('Items');
+      print('after fetchLocalData');
       await backupDataSource.upload(data, 'Items');
+      print('after upload');
       final data1 = await sqLiteDataSource.fetchLocalData('Sales');
       await backupDataSource.upload(data1, 'Sales');
       return Left('Success');

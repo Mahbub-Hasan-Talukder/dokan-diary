@@ -56,6 +56,9 @@ class _ItemWiseRecordsViewState extends State<ItemWiseRecordsView> {
       child: ListView.builder(
         itemCount: records.length,
         itemBuilder: (context, index) {
+          if (records[index].purchaseCost == 0) {
+            return const SizedBox.shrink();
+          }
           double totalSell = records[index].totalSell ?? 0;
           double totalPurchase = records[index].purchaseCost ?? 0;
           String itemName = records[index].itemName ?? 'N/A';
