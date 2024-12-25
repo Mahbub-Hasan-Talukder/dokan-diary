@@ -33,26 +33,6 @@ class FireStoreImp implements BackupDataSource {
     } catch (e) {
       throw Exception(e.toString());
     }
-
-    // print('dbg before loop: ${items1.length}');
-    // int ind = 0;
-
-    // for (int i = 0; i < items.length; i++) {
-    //   Map<String, dynamic> item = items[i];
-
-    //   String docId = tableName == 'Items'
-    //       ? item['item_id'].replaceAll('/', '-')
-    //       : item['sale_id'].toString();
-
-    //   DocumentReference<Object?> docRef = itemsCollection.doc(docId);
-
-    //   // Use set to add/update document
-    //   await docRef.set(item).catchError((error) {
-    //     throw Exception(error.toString());
-    //   });
-    // }
-
-    // print('dbg: after loop');
   }
 
   Future<void> _deleteCollection(

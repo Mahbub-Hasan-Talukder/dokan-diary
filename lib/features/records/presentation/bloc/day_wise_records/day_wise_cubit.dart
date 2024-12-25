@@ -12,7 +12,10 @@ class DayWiseCubit extends Cubit<DayWiseState> {
 
   void fetchDateWiseRecords({String? startDate, String? endDate}) async {
     emit(DayWiseLoading());
-    final result = await _recordsUseCases.fetchDayWiseData();
+    final result = await _recordsUseCases.fetchDayWiseData(
+      startDate: startDate,
+      endDate: endDate,
+    );
 
     result.fold((records) {
       emit(DayWiseSuccess(records));

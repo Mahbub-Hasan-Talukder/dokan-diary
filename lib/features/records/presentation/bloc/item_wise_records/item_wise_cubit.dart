@@ -12,7 +12,10 @@ class ItemWiseCubit extends Cubit<ItemWiseState> {
 
   void fetchItemWiseRecords({String? startDate, String? endDate}) async {
     emit(ItemWiseLoading());
-    final result = await _recordsUseCases.fetchItemWiseData();
+    final result = await _recordsUseCases.fetchItemWiseData(
+      startDate: startDate,
+      endDate: endDate,
+    );
 
     result.fold((records) {
       emit(ItemWiseSuccess(records));

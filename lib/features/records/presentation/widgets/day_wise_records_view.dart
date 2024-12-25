@@ -7,6 +7,7 @@ import 'package:rxdart/rxdart.dart';
 import '../../../../core/di/di.dart';
 import '../../domain/entities/filter_entity.dart';
 import '../bloc/day_wise_records/day_wise_cubit.dart';
+import 'item_wise_records_view.dart';
 
 class DayWiseRecordsView extends StatefulWidget {
   const DayWiseRecordsView({super.key, required this.filterEntity});
@@ -21,13 +22,14 @@ class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
   final DayWiseCubit _dayWiseCubit = getIt.get<DayWiseCubit>();
 
   @override
-  void initState() {
-    _dayWiseCubit.fetchDateWiseRecords();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    _dayWiseCubit.fetchDateWiseRecords(
+      startDate: DateTimeFormat.getYMD(
+          widget.filterEntity.dateRange?.startDate ?? DateTime.now()),
+      endDate: DateTimeFormat.getYMD(
+          widget.filterEntity.dateRange?.endDate ?? DateTime.now()),
+    );
+
     return BlocBuilder<DayWiseCubit, DayWiseState>(
       bloc: _dayWiseCubit,
       builder: (context, state) {
@@ -55,56 +57,62 @@ class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
 
   Widget buildListView(List<DayWiseEntity> records) {
     records = _getSortedRecord(records: records);
+    final scrollController = ScrollController();
     return Expanded(
-      child: ListView.builder(
-        itemCount: records.length,
-        itemBuilder: (context, index) {
-          if (records[index].date == '' || records[index].date == null) {
-            return const SizedBox.shrink();
-          }
-          String date = records[index].date!;
-          double totalSell = records[index].totalSell ?? 0;
-          double totalPurchase = records[index].purchaseCost ?? 0;
-          double percentage = records[index].percentage ?? 0;
+      child: Scrollbar(
+        thickness: 10,
+        controller: scrollController,
+        child: ListView.builder(
+          controller: scrollController,
+          itemCount: records.length,
+          itemBuilder: (context, index) {
+            if (records[index].date == '' || records[index].date == null) {
+              return const SizedBox.shrink();
+            }
+            String date = records[index].date!;
+            double totalSell = records[index].totalSell ?? 0;
+            double totalPurchase = records[index].purchaseCost ?? 0;
+            double percentage = records[index].percentage ?? 0;
 
-          return ListTile(
-            title: Text(
-              DateTimeFormat.getPrettyDate(
-                DateTime.parse(
-                  date,
+            return ListTile(
+              title: Text(
+                DateTimeFormat.getPrettyDate(
+                  DateTime.parse(
+                    date,
+                  ),
                 ),
               ),
-            ),
-            leading: const Icon(Icons.date_range),
-            subtitle: Text(
-              'T Buy: ${totalPurchase.toStringAsFixed(2)} tk',
-              style: const TextStyle(fontSize: 14),
-            ),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'T sell: ${totalSell.toStringAsFixed(2)} tk',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: (totalPurchase > totalSell)
-                        ? Colors.red.shade800
-                        : Colors.green.shade800,
+              leading: const Icon(Icons.date_range),
+              subtitle: Text(
+                'T Buy: ${totalPurchase.toStringAsFixed(2)} tk',
+                style: const TextStyle(fontSize: 14),
+              ),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'T sell: ${totalSell.toStringAsFixed(2)} tk',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: (totalPurchase > totalSell)
+                          ? Colors.red.shade800
+                          : Colors.green.shade800,
+                    ),
                   ),
-                ),
-                Text(
-                  'Profit: ${(totalSell - totalPurchase).toStringAsFixed(2)} (${percentage.toStringAsFixed(2)}%)',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: (totalPurchase > totalSell)
-                        ? Colors.red.shade800
-                        : Colors.green.shade800,
+                  Text(
+                    'Profit: ${(totalSell - totalPurchase).toStringAsFixed(2)} (${percentage.toStringAsFixed(2)}%)',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: (totalPurchase > totalSell)
+                          ? Colors.red.shade800
+                          : Colors.green.shade800,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

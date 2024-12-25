@@ -61,8 +61,6 @@ class RecordsDataSourceImp implements RecordsDataSource {
         SUM(s.quantity_sold * i.item_unit_price) AS total_purchase_cost
     FROM Sales s
     JOIN Items i ON s.item_id = i.item_id
-    GROUP BY i.item_id
-    ORDER BY i.item_name;
   ''';
 
     List<String> whereClauses = [];
@@ -76,10 +74,9 @@ class RecordsDataSourceImp implements RecordsDataSource {
     }
 
     // Add GROUP BY and ORDER BY
-    // query +=
-    //     whereClauses.isNotEmpty ? ' WHERE ${whereClauses.join(' AND ')}' : '';
-    // query += ' GROUP BY s.sale_date';
-
+    query +=
+        whereClauses.isNotEmpty ? ' WHERE ${whereClauses.join(' AND ')}' : '';
+    query += ' GROUP BY i.item_id ORDER BY i.item_name';
     // Execute query
     return await _db!.rawQuery(query, whereArgs);
   }

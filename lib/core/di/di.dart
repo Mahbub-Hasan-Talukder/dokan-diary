@@ -27,6 +27,7 @@ import '../../features/buy/data/repository_imp/fetch_item_repo_imp.dart';
 import '../../features/buy/domain/repository/fetch_item_repo.dart';
 import '../../features/buy/domain/use_cases/fetch_item_use_case.dart';
 import '../../features/buy/presentation/cubits/fetch_items/fetch_item_cubit.dart';
+import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import '../../features/records/presentation/bloc/item_wise_records/item_wise_cubit.dart';
 import '../../features/sell/presentation/cubits/undo_record/undo_record_cubit.dart';
 import '../database/database_helper.dart';
@@ -44,6 +45,7 @@ void setupLocator() {
   getIt.registerFactory(() => UndoRecordCubit(getIt.call()));
   getIt.registerFactory(() => DayWiseCubit(getIt.call()));
   getIt.registerFactory(() => ItemWiseCubit(getIt.call()));
+  getIt.registerFactory(() => DashboardCubit());
 
   //use case
   getIt.registerLazySingleton<FetchItemUseCase>(

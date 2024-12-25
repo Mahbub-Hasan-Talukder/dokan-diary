@@ -17,8 +17,11 @@ class RecordsRepositoryImp implements RecordsRepository {
   Future<Either<List<DayWiseEntity>, String>> fetchDayWiseData(
       {String? startDate, String? endDate}) async {
     try {
-      final response = await _recordsDataSource.fetchDayWiseSellInfo();
-      final result = response.map((itemJson){
+      final response = await _recordsDataSource.fetchDayWiseSellInfo(
+        startDate: startDate,
+        endDate: endDate,
+      );
+      final result = response.map((itemJson) {
         return DayWiseResponse.fromJson(json: itemJson).toEntity();
       }).toList();
       return Left(result);
@@ -28,10 +31,14 @@ class RecordsRepositoryImp implements RecordsRepository {
   }
 
   @override
-  Future<Either<List<ItemWiseEntity>, String>> fetchItemWiseData({String? startDate, String? endDate})async {
+  Future<Either<List<ItemWiseEntity>, String>> fetchItemWiseData(
+      {String? startDate, String? endDate}) async {
     try {
-      final response = await _recordsDataSource.fetchItemWiseSellInfo();
-      final result = response.map((itemJson){
+      final response = await _recordsDataSource.fetchItemWiseSellInfo(
+        startDate: startDate,
+        endDate: endDate,
+      );
+      final result = response.map((itemJson) {
         return ItemWiseResponse.fromJson(json: itemJson).toEntity();
       }).toList();
       return Left(result);
@@ -39,6 +46,4 @@ class RecordsRepositoryImp implements RecordsRepository {
       return Right(e.toString());
     }
   }
-
-
 }

@@ -1,3 +1,4 @@
+import 'package:diary/core/services/date_time_format.dart';
 import 'package:diary/features/records/presentation/widgets/day_wise_records_view.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
@@ -17,6 +18,10 @@ class _RecordsState extends State<Records> {
     queryType: QueryTypes.calender,
     sortingOrder: SortingOrder.descending,
     targetAttribute: TargetAttribute.date,
+    dateRange: DateRange(
+      startDate: DateTime.now().subtract(const Duration(days: 366)),
+      endDate: DateTime.now(),
+    ),
   ));
 
   @override
@@ -37,8 +42,11 @@ class _RecordsState extends State<Records> {
       body: StreamBuilder(
         stream: _filteringBehavior,
         builder: (context, snapshot) {
+          print('dbg build startDate: ${snapshot.data?.dateRange?.startDate}');
+          print('dbg build endDate: ${snapshot.data?.dateRange?.endDate}');
           return Column(
             children: [
+              _dateRange(context, snapshot),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -50,6 +58,7 @@ class _RecordsState extends State<Records> {
                       context: context,
                       isActive: QueryTypes.calender ==
                           (snapshot.data?.queryType ?? QueryTypes.calender),
+                      filterEntity: snapshot.data,
                     ),
                     buildFilterButton(
                       queryInput: QueryTypes.item,
@@ -57,6 +66,7 @@ class _RecordsState extends State<Records> {
                       context: context,
                       isActive: QueryTypes.item ==
                           (snapshot.data?.queryType ?? QueryTypes.item),
+                      filterEntity: snapshot.data,
                     ),
                   ],
                 ),
@@ -89,16 +99,75 @@ class _RecordsState extends State<Records> {
               if ((snapshot.data?.queryType ?? QueryTypes.calender) ==
                   QueryTypes.calender)
                 DayWiseRecordsView(
-                  filterEntity: snapshot.data ?? FilterEntity(),
+                  filterEntity: snapshot.data ?? _filteringBehavior.value,
                 ),
               if ((snapshot.data?.queryType ?? QueryTypes.calender) ==
                   QueryTypes.item)
                 ItemWiseRecordsView(
-                  filterEntity: snapshot.data ?? FilterEntity(),
+                  filterEntity: snapshot.data ?? _filteringBehavior.value,
                 ),
             ],
           );
         },
+      ),
+    );
+  }
+
+  SingleChildScrollView _dateRange(
+      BuildContext context, AsyncSnapshot<FilterEntity> snapshot) {
+    return SingleChildScrollView(
+      //show date range
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Theme.of(context).colorScheme.surface,
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${DateTimeFormat.getPrettyDate(snapshot.data?.dateRange?.startDate ?? DateTime.now())} - ${DateTimeFormat.getPrettyDate(snapshot.data?.dateRange?.endDate ?? DateTime.now())}',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: () async {
+                    final DateTimeRange? picked = await showDateRangePicker(
+                      context: context,
+                      firstDate:
+                          DateTime.now().subtract(const Duration(days: 366)),
+                      lastDate: DateTime.now(),
+                    );
+                    if (picked != null) {
+                      _filteringBehavior.add(
+                        FilterEntity.copyWith(
+                          queryType: QueryTypes.calender,
+                          dateRange: DateRange(
+                            startDate: picked.start,
+                            endDate: picked.end,
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  icon: Icon(
+                    Icons.calendar_month,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -130,48 +199,98 @@ class _RecordsState extends State<Records> {
     required String label,
     required BuildContext context,
     required bool isActive,
+    FilterEntity? filterEntity,
   }) {
-    return SizedBox(
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       width: MediaQuery.sizeOf(context).width * .48,
-      child: TextButton(
-        onPressed: () {
-          FilterEntity en = FilterEntity.copyWith(queryType: queryInput);
-          _filteringBehavior.add(FilterEntity.copyWith(queryType: queryInput));
-        },
-        style: ButtonStyle(
-          backgroundColor: WidgetStatePropertyAll(
-            (isActive) ? Theme.of(context).colorScheme.primary : Colors.grey,
-          ),
-          foregroundColor: WidgetStatePropertyAll(
-            Theme.of(context).colorScheme.surface,
+      child: Material(
+        elevation: isActive ? 2 : 0,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            _filteringBehavior.add(FilterEntity.copyWith(
+              queryType: queryInput,
+              dateRange: filterEntity?.dateRange,
+            ));
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: isActive
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.surface,
+              border: Border.all(
+                color: isActive
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.outline.withOpacity(0.5),
+              ),
+            ),
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isActive
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
           ),
         ),
-        child: Text(label),
       ),
     );
   }
 
-  Widget filterButton(TargetAttribute targetAttribute, String label,
-      bool isActive, FilterEntity? filterEntity) {
-    return ElevatedButton(
-      onPressed: () {
-        _filteringBehavior.add(
-            // FilterEntity.copyWith(targetAttribute: targetAttribute),
-            FilterEntity.copyWith(
-          sortingOrder: filterEntity?.sortingOrder ?? SortingOrder.descending,
-          queryType: filterEntity?.queryType ?? QueryTypes.calender,
-          targetAttribute: targetAttribute,
-        ));
-      },
-      style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(
-          (isActive) ? Theme.of(context).colorScheme.primary : Colors.grey,
-        ),
-        foregroundColor: WidgetStatePropertyAll(
-          Theme.of(context).colorScheme.surface,
+  Widget filterButton(
+    TargetAttribute targetAttribute,
+    String label,
+    bool isActive,
+    FilterEntity? filterEntity,
+  ) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      child: Material(
+        elevation: isActive ? 2 : 0,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            _filteringBehavior.add(FilterEntity.copyWith(
+              sortingOrder:
+                  filterEntity?.sortingOrder ?? SortingOrder.descending,
+              queryType: filterEntity?.queryType ?? QueryTypes.calender,
+              targetAttribute: targetAttribute,
+              dateRange: filterEntity?.dateRange,
+            ));
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: isActive
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.surface,
+              border: Border.all(
+                color: isActive
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.outline.withOpacity(0.5),
+              ),
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isActive
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ),
         ),
       ),
-      child: Text(label),
     );
   }
 }

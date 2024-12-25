@@ -1,5 +1,4 @@
 import 'package:diary/features/backup/presentation/widgets/delete_data.dart';
-import 'package:diary/features/backup/presentation/widgets/save_to_device.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
@@ -9,6 +8,7 @@ import 'backup/presentation/widgets/upload_widget.dart';
 import 'sell/presentation/pages/sell.dart';
 import 'records/presentation/pages/records.dart';
 import 'buy/presentation/pages/buy.dart';
+import 'dashboard/presentation/pages/dashboard.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -84,12 +84,17 @@ class _HomePageState extends State<HomePage> {
                       return const Buy();
                     } else if (snapshot.data == 1) {
                       return const Sell();
+                    } else if (snapshot.data == 2) {
+                      return const Records();
+                    } else if (snapshot.data == 3) {
+                      return const Dashboard();
                     }
                     return const Records();
                   },
                 ),
               ),
               Container(
+                //work as bottom nav bar
                 color: Colors.grey.shade100,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -108,6 +113,11 @@ class _HomePageState extends State<HomePage> {
                       text: 'Records',
                       icon: Icons.list_rounded,
                       index: 2,
+                    ),
+                    navButton(
+                      text: 'Dashboard',
+                      icon: Icons.dashboard_rounded,
+                      index: 3,
                     ),
                   ],
                 ),
