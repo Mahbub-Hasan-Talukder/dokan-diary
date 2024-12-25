@@ -459,8 +459,8 @@ class FireStoreImp implements BackupDataSource {
       "item_unit_type": "kg"
     },
     {
-      "item_id": "lux screw 1\"_181.67",
-      "item_name": "lux screw 1\"",
+      "item_id": "lux screw 1.5\"_181.67",
+      "item_name": "lux screw 1.5\"",
       "item_quantity": 16.469,
       "item_unit_price": 181.6666667,
       "item_unit_type": "kg"
