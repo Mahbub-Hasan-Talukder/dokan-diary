@@ -1,4 +1,9 @@
+import 'package:diary/core/services/date_time_format.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/di/di.dart';
+import '../../../records/domain/entities/day_wise_entity.dart';
+import '../../../records/presentation/bloc/day_wise_records/day_wise_cubit.dart';
 import '../widgets/filter_options.dart';
 
 class Dashboard extends StatefulWidget {
@@ -9,32 +14,140 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  // String selectedFilter = 'Last Month';
-  // DateTimeRange? customDateRange;
+  final _dayWiseCubit = getIt.get<DayWiseCubit>();
+
+  @override
+  void initState() {
+    _dayWiseCubit.fetchDateWiseRecords(
+      startDate: DateTimeFormat.getYMD(
+        DateTime.now().subtract(const Duration(days: 30)),
+      ),
+      endDate: DateTimeFormat.getYMD(
+        DateTime.now(),
+      ),
+    );
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: const Column(
+      child: Column(
         children: [
-          const FilterOptions(),
-
-          // if (customDateRange != null)
-          //   Padding(
-          //     padding: const EdgeInsets.all(8.0),
-          //     child: Text(
-          //       'Selected Range: ${customDateRange!.start.toString().split(' ')[0]} to ${customDateRange!.end.toString().split(' ')[0]}',
-          //     ),
-          //   ),
-          const Expanded(
-            child: Center(
-              child: Text('Dashboard Content'),
-            ),
+          FilterOptions(dayWiseCubit: _dayWiseCubit),
+          BlocBuilder<DayWiseCubit, DayWiseState>(
+            bloc: _dayWiseCubit,
+            builder: (context, state) {
+              if (state is DayWiseSuccess) {
+                return Column(
+                  children: [
+                    _shortSummary(state.records),
+                  ],
+                );
+              }
+              if (state is DayWiseError) {
+                return Center(child: Text(state.error));
+              }
+              if (state is DayWiseLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return const SizedBox.shrink();
+            },
           ),
         ],
       ),
     );
+  }
+
+  Widget _shortSummary(List<DayWiseEntity> records) {
+    double totalSell = 0;
+    double totalBuy = 0;
+    for (var record in records) {
+      totalSell += record.totalSell ?? 0;
+      totalBuy += record.purchaseCost ?? 0;
+    }
+    double profit = totalSell - totalBuy;
+
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // const Text(
+            //   'Summary',
+            //   style: TextStyle(
+            //     fontSize: 18,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _summaryItem(
+                  'Total Sales',
+                  totalSell,
+                  Colors.blue,
+                ),
+                _summaryItem(
+                  'Total Purchase',
+                  totalBuy,
+                  Colors.orange,
+                ),
+                _summaryItem(
+                  'Total Profit',
+                  profit,
+                  profit >= 0 ? Colors.green : Colors.red,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _summaryItem(String label, double amount, Color color) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          _commaSeparatedString(amount.toStringAsFixed(2)),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _commaSeparatedString(String num) {
+    // Split the number into whole and decimal parts
+    List<String> parts = num.split('.');
+    String wholePart = parts[0];
+    String decimalPart = parts.length > 1 ? '.${parts[1]}' : '';
+
+    // Add commas to the whole part
+    final RegExp reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
+    String result = wholePart.replaceAllMapped(
+      reg,
+      (Match match) => '${match[1]},',
+    );
+
+    // Combine with decimal part
+    return result + decimalPart;
   }
 
   // DropdownButton<String> _dropdownFilterOptions(BuildContext context) {

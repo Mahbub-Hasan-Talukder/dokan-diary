@@ -1,8 +1,12 @@
+import 'package:diary/core/services/date_time_format.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../records/presentation/bloc/day_wise_records/day_wise_cubit.dart';
+
 class FilterOptions extends StatefulWidget {
-  const FilterOptions({super.key});
+  const FilterOptions({super.key, required this.dayWiseCubit});
+  final DayWiseCubit dayWiseCubit;
 
   @override
   State<FilterOptions> createState() => _FilterOptionsState();
@@ -71,8 +75,11 @@ class _FilterOptionsState extends State<FilterOptions> {
         startDate = DateTime.now();
     }
 
-    // TODO: Implement your filter logic here using startDate and endDate
-    // You can fetch and display data based on these dates
-    print('Filtering from $startDate to $endDate');
+    widget.dayWiseCubit.fetchDateWiseRecords(
+      startDate: DateTimeFormat.getYMD(startDate),
+      endDate: DateTimeFormat.getYMD(endDate),
+    );
+    print(
+        'Filtering from ${DateTimeFormat.getYMD(startDate)} to ${DateTimeFormat.getYMD(endDate)}');
   }
 }
