@@ -42,8 +42,6 @@ class _RecordsState extends State<Records> {
       body: StreamBuilder(
         stream: _filteringBehavior,
         builder: (context, snapshot) {
-          print('dbg build startDate: ${snapshot.data?.dateRange?.startDate}');
-          print('dbg build endDate: ${snapshot.data?.dateRange?.endDate}');
           return Column(
             children: [
               _dateRange(context, snapshot),

@@ -17,6 +17,9 @@ class _MergeItemState extends State<MergeItem> {
   final TextEditingController _mergingItemNameController =
       TextEditingController();
   final TextEditingController _intoItemNameController = TextEditingController();
+  String? mergingId, intoId;
+  double? mergingItemQuantity, mergingItemUnitPrice;
+  double? intoItemQuantity, intoItemUnitPrice;
   @override
   void initState() {
     dashboardCubit.fetchData();
@@ -41,50 +44,118 @@ class _MergeItemState extends State<MergeItem> {
         if (state is DashboardError) {
           return Center(child: Text(state.message));
         }
+        if (state is ItemMergeError) {
+          return Center(child: Text(state.message));
+        }
+        if (state is ItemMergeSuccess) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+            );
+          });
+        }
+
+        List<DashboardEntity> items = [];
         if (state is DashboardSuccess) {
-          List<DashboardEntity> items = state.data;
-          return Card(
-            elevation: 3,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: itemNameInput(
-                          items,
-                          _mergingItemNameController,
-                          'Merge',
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: itemNameInput(
-                          items,
-                          _intoItemNameController,
-                          'Into',
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      child: const Text(
+          items = state.data;
+        }
+        return Card(
+          elevation: 3,
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: itemNameInput(
+                        items,
+                        _mergingItemNameController,
                         'Merge',
-                        style: TextStyle(color: Colors.white),
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: itemNameInput(
+                        items,
+                        _intoItemNameController,
+                        'Into',
+                      ),
+                    ),
+                  ],
+                ),
+                if (mergingId != null || intoId != null)
+                  _showMergingItemDetails(),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: !isValidToMerge()
+                        ? null
+                        : () {
+                            _showAlertDialog(context, items);
+                          },
+                    style: TextButton.styleFrom(
+                      backgroundColor: !isValidToMerge()
+                          ? Colors.grey
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                    child: (state is ItemMergeLoading)
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            'Merge',
+                            style: TextStyle(color: Colors.white),
+                          ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          );
-        }
-        return const SizedBox.shrink();
+          ),
+        );
+      },
+    );
+  }
+
+  Future<dynamic> _showAlertDialog(
+    BuildContext context,
+    List<DashboardEntity> items,
+  ) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Merge Items'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Are you sure you want to merge your data?'),
+              Text('Ensure Network is connected',
+                  style: TextStyle(color: Colors.red)),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                dashboardCubit.mergeItem(
+                  items.firstWhere((e) => e.id == mergingId),
+                  items.firstWhere((e) => e.id == intoId),
+                );
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
       },
     );
   }
@@ -106,7 +177,18 @@ class _MergeItemState extends State<MergeItem> {
       displayStringForOption: (DashboardEntity option) => option.id ?? '',
       onSelected: (DashboardEntity selection) {
         setState(() {
-          mergingController.text = selection.itemName ?? '';
+          if (hintText == 'Merge') {
+            mergingId = selection.id;
+            _mergingItemNameController.text = selection.itemName ?? '';
+            mergingItemQuantity = selection.quantity;
+            mergingItemUnitPrice = selection.unitPrice;
+          } else {
+            intoId = selection.id;
+            _intoItemNameController.text = selection.itemName ?? '';
+            intoItemQuantity = selection.quantity;
+            intoItemUnitPrice = selection.unitPrice;
+          }
+
           // _selectedItem = selection.itemName ?? '';
           // _selectedId = selection.id ?? '';
           // _itemNameController.text = selection.itemName ?? '';
@@ -126,6 +208,15 @@ class _MergeItemState extends State<MergeItem> {
         return TextFormField(
           controller: mergingController,
           focusNode: focusNode,
+          onChanged: (value) {
+            setState(() {
+              if (hintText == 'Merge') {
+                mergingId = null;
+              } else {
+                intoId = null;
+              }
+            });
+          },
           decoration: InputDecoration(
             labelText: hintText,
             hintText: "Type to search and select",
@@ -140,5 +231,33 @@ class _MergeItemState extends State<MergeItem> {
       },
       optionsViewOpenDirection: OptionsViewOpenDirection.up,
     );
+  }
+
+  _showMergingItemDetails() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(
+          child: Column(
+            children: [
+              Text('Quantity: ${mergingItemQuantity?.toStringAsFixed(2)}'),
+              Text('Unit Price: ${mergingItemUnitPrice?.toStringAsFixed(2)}'),
+            ],
+          ),
+        ),
+        Flexible(
+          child: Column(
+            children: [
+              Text('Quantity: ${intoItemQuantity?.toStringAsFixed(2)}'),
+              Text('Unit Price: ${intoItemUnitPrice?.toStringAsFixed(2)}'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  bool isValidToMerge() {
+    return (mergingId != null) && (intoId != null);
   }
 }

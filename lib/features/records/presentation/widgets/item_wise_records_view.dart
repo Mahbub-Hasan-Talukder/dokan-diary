@@ -20,9 +20,6 @@ class _ItemWiseRecordsViewState extends State<ItemWiseRecordsView> {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        'dbg in itemwise startDate: ${widget.filterEntity.dateRange?.startDate}');
-    print('dbg in itemwise endDate: ${widget.filterEntity.dateRange?.endDate}');
     _dayWiseCubit.fetchItemWiseRecords(
       startDate: DateTimeFormat.getYMD(
           widget.filterEntity.dateRange?.startDate ?? DateTime.now()),

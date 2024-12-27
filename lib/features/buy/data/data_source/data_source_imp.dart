@@ -97,8 +97,5 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
     ''',
       [unitPrice, quantity, itemId], // Bind the values here
     );
-
-    // Optionally, log the number of rows updated
-    // print('$count record(s) updated in Items table');
   }
 }
