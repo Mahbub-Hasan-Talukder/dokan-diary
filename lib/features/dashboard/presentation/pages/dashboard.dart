@@ -5,6 +5,8 @@ import '../../../../core/di/di.dart';
 import '../../../records/domain/entities/day_wise_entity.dart';
 import '../../../records/presentation/bloc/day_wise_records/day_wise_cubit.dart';
 import '../widgets/filter_options.dart';
+import '../widgets/line_chart.dart';
+import '../widgets/merge_item.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -43,6 +45,8 @@ class _DashboardState extends State<Dashboard> {
                 return Column(
                   children: [
                     _shortSummary(state.records),
+                    const SizedBox(height: 16),
+                    MergeItem(),
                   ],
                 );
               }

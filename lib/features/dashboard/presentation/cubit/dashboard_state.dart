@@ -7,7 +7,7 @@ class DashboardInitial extends DashboardState {}
 class DashboardLoading extends DashboardState {}
 
 class DashboardSuccess extends DashboardState {
-  final List<dynamic> data;
+  final List<DashboardEntity> data;
   DashboardSuccess(this.data);
 }
 

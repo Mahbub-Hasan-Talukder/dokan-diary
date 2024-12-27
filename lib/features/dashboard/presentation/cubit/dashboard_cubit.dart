@@ -1,15 +1,24 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/entity/dashboard_entity.dart';
+import '../../domain/use_case/dashboard_usecase.dart';
+
 part 'dashboard_state.dart';
 
 class DashboardCubit extends Cubit<DashboardState> {
-  DashboardCubit() : super(DashboardInitial());
+  DashboardCubit(this.dashboardUsecase) : super(DashboardInitial());
+  final DashboardUsecase dashboardUsecase;
 
   Future<void> fetchData({DateTime? startDate, DateTime? endDate}) async {
     try {
       emit(DashboardLoading());
-      // TODO: Implement your data fetching logic here
-      emit(DashboardSuccess([])); // Replace [] with your actual data
+      final result = await dashboardUsecase.fetchData();
+      result.fold(
+        (l) => emit(DashboardError(l)),
+        (r) {
+          emit(DashboardSuccess(r));
+        },
+      );
     } catch (e) {
       emit(DashboardError(e.toString()));
     }
