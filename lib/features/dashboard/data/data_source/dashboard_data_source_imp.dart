@@ -18,12 +18,14 @@ class DashboardDataSourceImp implements DashboardDataSource {
   @override
   Future<void> deleteItem(String itemId) async {
     try {
+      await firebaseFirestore.collection('Items').doc(itemId).delete();
+
       _db ??= await dbHelper.database;
       if (_db != null) {
         await _db!.rawDelete('''
           DELETE FROM Items WHERE item_id = ?;
         ''', [itemId]);
-        await firebaseFirestore.collection('Items').doc(itemId).delete();
+
         return;
       }
     } catch (e) {
@@ -55,6 +57,11 @@ class DashboardDataSourceImp implements DashboardDataSource {
 
     // Execute the update query
     try {
+      await firebaseFirestore.collection('Items').doc(itemId).update({
+        'item_unit_price': newUnitPrice,
+        'item_quantity': newQuantity,
+      });
+
       await _db!.rawUpdate(
         '''
         UPDATE Items
@@ -66,11 +73,6 @@ class DashboardDataSourceImp implements DashboardDataSource {
         ''',
         [newUnitPrice, newQuantity, itemId], // Bind the values here
       );
-
-      await firebaseFirestore.collection('Items').doc(itemId).update({
-        'item_unit_price': newUnitPrice,
-        'item_quantity': newQuantity,
-      });
     } catch (e) {
       throw Exception('Failed to update item: ${e.toString()}');
     }

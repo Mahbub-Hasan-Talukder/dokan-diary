@@ -67,6 +67,7 @@ class SellDataRepoImp implements SellDataRepo {
           break;
         }
       }
+      await sellDataSource.deleteSellFromFirestore(saleId.toString());
       if (entity != null) {
         await sellDataSource.updateItemQuantity(
           itemId,

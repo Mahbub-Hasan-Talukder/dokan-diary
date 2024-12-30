@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/features/sell/domain/entities/sell_request_entity.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -76,5 +77,10 @@ class SellDataSourceImp implements SellDataSource {
       return;
     }
     throw Exception('Database instance not created');
+  }
+
+  @override
+  Future<void> deleteSellFromFirestore(String saleId) async {
+    await FirebaseFirestore.instance.collection('Sales').doc(saleId).delete();
   }
 }

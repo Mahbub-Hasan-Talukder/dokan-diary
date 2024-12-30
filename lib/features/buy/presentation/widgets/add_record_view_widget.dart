@@ -168,8 +168,7 @@ class AddRecordViewState extends State<AddRecordView> {
       height: 60,
       child: ElevatedButton(
         onPressed: () {
-          widget.fetchItemCubit
-              .deleteItem(itemId: _selectedId ?? '', price: '');
+          _showAlertDialog(context);
         },
         child: Text(
           'delete',
@@ -266,6 +265,44 @@ class AddRecordViewState extends State<AddRecordView> {
         );
       },
       optionsViewOpenDirection: OptionsViewOpenDirection.up,
+    );
+  }
+
+  Future<dynamic> _showAlertDialog(
+    BuildContext context,
+  ) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete Item'),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Are you sure you want delete your data?'),
+              Text('Ensure Network is connected',
+                  style: TextStyle(color: Colors.red)),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                widget.fetchItemCubit
+                    .deleteItem(itemId: _selectedId ?? '', price: '');
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

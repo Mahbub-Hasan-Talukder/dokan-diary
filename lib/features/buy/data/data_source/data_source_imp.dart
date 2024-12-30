@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:diary/features/buy/domain/entities/add_request_entity.dart';
 import 'package:sqflite/sqflite.dart';
@@ -81,13 +82,18 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
     required double unitPrice,
     required double quantity,
   }) async {
-    // Get the database instance
+    try {
+      await updateToFirestore(
+        itemId: itemId,
+        unitPrice: unitPrice,
+        quantity: quantity,
+      );
 
-    _db ??= await dbHelper.database;
+      _db ??= await dbHelper.database;
 
-    // Execute the update query
-    await _db!.rawUpdate(
-      '''
+      // Execute the update query
+      await _db!.rawUpdate(
+        '''
     UPDATE Items
     SET 
       item_unit_price = ?, 
@@ -95,7 +101,35 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
     WHERE 
       item_id = ?;
     ''',
-      [unitPrice, quantity, itemId], // Bind the values here
-    );
+        [unitPrice, quantity, itemId], // Bind the values here
+      );
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<void> deleteFromFirestore({required String itemId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('Items').doc(itemId).delete();
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<void> updateToFirestore({
+    required String itemId,
+    required double unitPrice,
+    required double quantity,
+  }) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('Items')
+          .doc(itemId)
+          .update({'item_unit_price': unitPrice, 'item_quantity': quantity});
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:diary/core/services/date_time_format.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/di.dart';
@@ -46,7 +47,11 @@ class _DashboardState extends State<Dashboard> {
                   children: [
                     _shortSummary(state.records),
                     const SizedBox(height: 16),
-                    MergeItem(),
+                    (state.records.isEmpty)
+                        ? const Text('No data to show')
+                        : LineChartSample1(records: state.records),
+                    const SizedBox(height: 16),
+                    const MergeItem(),
                   ],
                 );
               }
@@ -149,71 +154,146 @@ class _DashboardState extends State<Dashboard> {
       reg,
       (Match match) => '${match[1]},',
     );
-
-    // Combine with decimal part
     return result + decimalPart;
   }
+}
 
-  // DropdownButton<String> _dropdownFilterOptions(BuildContext context) {
-  //   return DropdownButton<String>(
-  //     isExpanded: true,
-  //     value: selectedFilter,
-  //     items: ['Today', 'Last Week', 'Last Month', 'Last Year', 'Custom Range']
-  //         .map((String value) {
-  //       return DropdownMenuItem<String>(
-  //         value: value,
-  //         child: ListTile(
-  //           title: Text(value),
-  //           textColor: Theme.of(context).colorScheme.primary,
-  //         ),
-  //       );
-  //     }).toList(),
-  //     onChanged: (String? newValue) async {
-  //       if (newValue == 'Custom Range') {
-  //         final DateTimeRange? picked = await showDateRangePicker(
-  //           context: context,
-  //           firstDate: DateTime(2020),
-  //           lastDate: DateTime.now(),
-  //         );
-  //         if (picked != null) {
-  //           setState(() {
-  //             customDateRange = picked;
-  //             selectedFilter = newValue!;
-  //           });
-  //         }
-  //       } else {
-  //         setState(() {
-  //           selectedFilter = newValue!;
-  //           customDateRange = null;
-  //         });
-  //       }
-  //       _applyFilter();
-  //     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // LineChartData getSampleData1() => LineChartData(
+  //       gridData: gridData,
+  //       titlesData: titlesData,
+  //       // lineTouchData: lineTouchData,
+  //       lineBarsData: lineBarsData,
+  //       borderData: borderData,
+  //       minX: 0,
+  //       maxX: 14,
+  //       minY: 0,
+  //       maxY: 4,
+  //     );
+
+  // List<LineChartBarData> get lineBarsData => [
+  //       lineChartBarsData,
+  //     ];
+
+  // FlTitlesData get titlesData => FlTitlesData(
+  //       show: true,
+  //       leftTitles: AxisTitles(sideTitles: leftTiles()),
+  //       bottomTitles: AxisTitles(sideTitles: bottomTiles),
+  //       rightTitles:
+  //           const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+  //       topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+  //     );
+
+  // Widget leftTileWidget(double value, TitleMeta meta) {
+  //   final style = TextStyle(
+  //     fontSize: 12,
+  //     fontWeight: FontWeight.bold,
+  //     color: Colors.black,
+  //   );
+  //   String? text;
+  //   switch (value.toInt()) {
+  //     case 1:
+  //       text = '1M';
+  //       break;
+  //     case 2:
+  //       text = '2M';
+  //       break;
+  //     case 3:
+  //       text = '3M';
+  //       break;
+  //     case 4:
+  //       text = '4M';
+  //       break;
+  //     case 5:
+  //       text = '5M';
+  //       break;
+  //     default:
+  //       return const SizedBox.shrink();
+  //   }
+
+  //   return Text(text, style: style, textAlign: TextAlign.center);
+  // }
+
+  // SideTitles leftTiles() => SideTitles(
+  //       getTitlesWidget: leftTileWidget,
+  //       showTitles: true,
+  //       reservedSize: 40,
+  //       interval: 1,
+  //     );
+
+  // Widget bottomTileWidget(double value, TitleMeta meta) {
+  //   final style = TextStyle(
+  //     fontSize: 12,
+  //     fontWeight: FontWeight.bold,
+  //     color: Colors.black,
+  //   );
+  //   String? text;
+  //   switch (value.toInt()) {
+  //     case 0:
+  //       text = '2021-01 ';
+  //       break;
+  //     case 1:
+  //       text = '2022-01';
+  //       break;
+  //     case 2:
+  //       text = '2023-01';
+  //       break;
+  //     default:
+  //       text = '';
+  //   }
+  //   Widget textWidget = Text(text, style: style, textAlign: TextAlign.center);
+  //   return SideTitleWidget(
+  //     axisSide: meta.axisSide,
+
+  //     space: 10,
+  //     child: textWidget,
   //   );
   // }
 
-  // void _applyFilter() {
-  //   DateTime startDate;
-  //   DateTime endDate = DateTime.now();
+  // SideTitles get bottomTiles => SideTitles(
+  //       getTitlesWidget: bottomTileWidget,
+  //       showTitles: true,
+  //       reservedSize: 40,
+  //       interval: 1,
+  //     );
 
-  //   switch (selectedFilter) {
-  //     case 'Today':
-  //       startDate = DateTime.now().subtract(const Duration(days: 1));
-  //     case 'Last Week':
-  //       startDate = DateTime.now().subtract(const Duration(days: 7));
-  //     case 'Last Month':
-  //       startDate = DateTime.now().subtract(const Duration(days: 30));
-  //     case 'Last Year':
-  //       startDate = DateTime.now().subtract(const Duration(days: 365));
-  //     case 'Custom Range':
-  //       startDate = customDateRange?.start ?? DateTime.now();
-  //       endDate = customDateRange?.end ?? DateTime.now();
-  //     default:
-  //       startDate = DateTime.now();
-  //   }
+  // FlGridData get gridData => const FlGridData(
+  //       show: false,
+  //     );
 
-  // TODO: Implement your filter logic here using startDate and endDate
-  // You can fetch and display data based on these dates
-  // print('Filtering from $startDate to $endDate');
-  // }
-}
+  // FlBorderData get borderData => FlBorderData(
+  //       show: true,
+  //       border: Border.all(color: Colors.grey, width: 1),
+  //     );
+
+  // LineChartBarData get lineChartBarsData => LineChartBarData(
+  //       isCurved: true,
+  //       color: Colors.blue,
+  //       barWidth: 2,
+  //       isStrokeCapRound: true,
+  //       dotData: FlDotData(
+  //         show: false,
+  //       ),
+  //       belowBarData: BarAreaData(
+  //         show: true,
+  //         color: Colors.blue.withOpacity(0.1),
+  //       ),
+  //       spots: [
+  //         FlSpot(0, 1),
+  //         FlSpot(6, 2),
+  //         FlSpot(12, 3),
+  //       ],
+  //     );

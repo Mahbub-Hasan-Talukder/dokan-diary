@@ -79,7 +79,5 @@ class _FilterOptionsState extends State<FilterOptions> {
       startDate: DateTimeFormat.getYMD(startDate),
       endDate: DateTimeFormat.getYMD(endDate),
     );
-    print(
-        'Filtering from ${DateTimeFormat.getYMD(startDate)} to ${DateTimeFormat.getYMD(endDate)}');
   }
 }

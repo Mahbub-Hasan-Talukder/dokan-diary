@@ -31,12 +31,13 @@ class DashboardRepoImp implements DashboardRepo {
       final intoItemId = mergeRequestEntity.intoItemId;
       final intoItemQuantity = mergeRequestEntity.intoItemNewQuantity;
       final intoItemUnitPrice = mergeRequestEntity.intoItemNewUnitPrice;
-      await dashboardDataSource.updateItem(
-        itemId: intoItemId,
-        newQuantity: intoItemQuantity,
-        newUnitPrice: intoItemUnitPrice,
-      );
+
       if (await dashboardDataSource.doesItemExist(itemId: mergingItemId)) {
+        await dashboardDataSource.updateItem(
+          itemId: intoItemId,
+          newQuantity: intoItemQuantity,
+          newUnitPrice: intoItemUnitPrice,
+        );
         await dashboardDataSource.deleteItem(mergingItemId);
       }
       return right('Item merged successfully');
