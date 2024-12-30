@@ -99,6 +99,9 @@ class _MergeItemState extends State<MergeItem> {
                             _showAlertDialog(context, items);
                           },
                     style: TextButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       backgroundColor: !isValidToMerge()
                           ? Colors.grey
                           : Theme.of(context).colorScheme.primary,
@@ -128,7 +131,7 @@ class _MergeItemState extends State<MergeItem> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Merge Items'),
-          content: Column(
+          content: const Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

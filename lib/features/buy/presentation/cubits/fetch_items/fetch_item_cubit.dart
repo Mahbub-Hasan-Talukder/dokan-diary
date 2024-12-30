@@ -28,8 +28,8 @@ class FetchItemCubit extends Cubit<FetchItemState> {
     required double unitPrice,
     required double itemQuantity,
   }) async {
-    // String id = "${itemName}_${unitPrice.toStringAsFixed(2)}";
-    String id = itemName;
+    String id = "${itemName}_${unitPrice.toStringAsFixed(2)}";
+    // String id = itemName;
 
     AddRequestEntity entity = AddRequestEntity(
       id: id,

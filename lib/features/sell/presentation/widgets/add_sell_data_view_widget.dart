@@ -119,6 +119,13 @@ class AddRecordViewState extends State<AddSellView> {
             width: double.infinity,
             height: 60,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
               onPressed: () {
                 handleOnPressed();
               },

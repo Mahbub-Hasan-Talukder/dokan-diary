@@ -99,9 +99,16 @@ class AddRecordViewState extends State<AddRecordView> {
 
   SizedBox _add(BuildContext context) {
     return SizedBox(
-      width: 100,
+      width: 130,
       height: 60,
       child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
         onPressed: () {
           if (_formKey.currentState!.validate() &&
               (double.tryParse(_quantityController.text) ?? 0) > 0) {
@@ -126,32 +133,21 @@ class AddRecordViewState extends State<AddRecordView> {
 
   SizedBox _edit(BuildContext context) {
     return SizedBox(
-      width: 100,
-      height: 60,
+      width: 110,
+      height: 50,
       child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
         onPressed: () {
           if (_formKey.currentState!.validate() &&
               (double.tryParse(_quantityController.text) ?? 0) > 0 &&
               _selectedId != null) {
-            double totalPrice =
-                (double.tryParse(_totalPriceCrontroller.text) ?? 0);
-            double? itemQuantity = double.tryParse(_quantityController.text);
-            double unitPrice = totalPrice / (itemQuantity ?? 1);
-            Future(() async {
-              // await FetchItemDataSourceImpl().updateItem(
-              //   itemId: _selectedId ?? '',
-              //   unitPrice: unitPrice,
-              //   quantity: itemQuantity ?? 0,
-              // );
-              widget.fetchItemCubit.deleteItem(itemId: _selectedId ?? '');
-              widget.fetchItemCubit.addItems(
-                itemName: _itemNameController.text,
-                unitType: 'kg',
-                unitPrice: unitPrice,
-                itemQuantity: itemQuantity ?? 0,
-              );
-              widget.fetchItemCubit.fetchItems();
-            });
+            _showEditDialog(context);
           } else {}
         },
         child: Text(
@@ -164,9 +160,16 @@ class AddRecordViewState extends State<AddRecordView> {
 
   SizedBox _delete(BuildContext context) {
     return SizedBox(
-      width: 100,
-      height: 60,
+      width: 110,
+      height: 50,
       child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
         onPressed: () {
           _showAlertDialog(context);
         },
@@ -303,6 +306,60 @@ class AddRecordViewState extends State<AddRecordView> {
           ],
         );
       },
+    );
+  }
+
+  void _showEditDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Item'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Are you sure you want edit your data?'),
+            Text(
+              'Ensure Network is connected',
+              style: TextStyle(color: Colors.red),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () {
+              double totalPrice =
+                  (double.tryParse(_totalPriceCrontroller.text) ?? 0);
+              double? itemQuantity = double.tryParse(_quantityController.text);
+              double unitPrice = totalPrice / (itemQuantity ?? 1);
+              Future(() async {
+                // await FetchItemDataSourceImpl().updateItem(
+                //   itemId: _selectedId ?? '',
+                //   unitPrice: unitPrice,
+                //   quantity: itemQuantity ?? 0,
+                // );
+                _selectedItem = _itemNameController.text;
+                widget.fetchItemCubit.deleteItem(itemId: _selectedId ?? '');
+                widget.fetchItemCubit.addItems(
+                  itemName: _selectedItem ?? 'aba',
+                  unitType: 'kg',
+                  unitPrice: unitPrice,
+                  itemQuantity: itemQuantity ?? 0,
+                );
+                widget.fetchItemCubit.fetchItems();
+              });
+              Navigator.of(context).pop();
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -41,7 +41,7 @@ class LineChartSample1State extends State<LineChartSample1> {
                 height: 37,
               ),
               const Text(
-                'Sales',
+                'Sales Chart',
                 style: TextStyle(
                   color: Colors.blueGrey,
                   fontSize: 18,

@@ -36,35 +36,37 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          FilterOptions(dayWiseCubit: _dayWiseCubit),
-          BlocBuilder<DayWiseCubit, DayWiseState>(
-            bloc: _dayWiseCubit,
-            builder: (context, state) {
-              if (state is DayWiseSuccess) {
-                return Column(
-                  children: [
-                    _shortSummary(state.records),
-                    const SizedBox(height: 16),
-                    (state.records.isEmpty)
-                        ? const Text('No data to show')
-                        : LineChartSample1(records: state.records),
-                    const SizedBox(height: 16),
-                    const MergeItem(),
-                  ],
-                );
-              }
-              if (state is DayWiseError) {
-                return Center(child: Text(state.error));
-              }
-              if (state is DayWiseLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            FilterOptions(dayWiseCubit: _dayWiseCubit),
+            BlocBuilder<DayWiseCubit, DayWiseState>(
+              bloc: _dayWiseCubit,
+              builder: (context, state) {
+                if (state is DayWiseSuccess) {
+                  return Column(
+                    children: [
+                      _shortSummary(state.records),
+                      // const SizedBox(height: 60),
+                      (state.records.isEmpty)
+                          ? const Text('No data to show')
+                          : LineChartSample1(records: state.records),
+                      const SizedBox(height: 16),
+                      const MergeItem(),
+                    ],
+                  );
+                }
+                if (state is DayWiseError) {
+                  return Center(child: Text(state.error));
+                }
+                if (state is DayWiseLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -77,6 +79,8 @@ class _DashboardState extends State<Dashboard> {
       totalBuy += record.purchaseCost ?? 0;
     }
     double profit = totalSell - totalBuy;
+    double averageSell = totalSell / records.length;
+    double averageProfit = profit / records.length;
 
     return Card(
       elevation: 2,
@@ -110,6 +114,22 @@ class _DashboardState extends State<Dashboard> {
                   'Total Profit',
                   profit,
                   profit >= 0 ? Colors.green : Colors.red,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _summaryItem(
+                  'Average Sales',
+                  averageSell,
+                  Colors.blue,
+                ),
+                _summaryItem(
+                  'Average Profit',
+                  averageProfit,
+                  Colors.green,
                 ),
               ],
             ),
