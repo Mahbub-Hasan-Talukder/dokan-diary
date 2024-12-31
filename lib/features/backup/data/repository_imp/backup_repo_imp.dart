@@ -38,6 +38,7 @@ class BackupRepoImp implements BackupRepository {
       final data = await sqLiteDataSource.fetchLocalData('Items');
       await backupDataSource.upload(data, 'Items');
       final data1 = await sqLiteDataSource.fetchLocalData('Sales');
+      print('dbg $data1');
       await backupDataSource.upload(data1, 'Sales');
       return Left('Success');
     } catch (e) {

@@ -19,6 +19,17 @@ import 'package:diary/features/sell/presentation/cubits/fetch_items/fetch_bought
 import 'package:diary/features/sell/presentation/cubits/sell_items/sell_data_cubit.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../features/add_note/data/data_source/local_data_source/note_local_data_source.dart';
+import '../../features/add_note/data/data_source/local_data_source/note_local_data_source_imp.dart';
+import '../../features/add_note/data/data_source/remote_data_source/note_remote_data_source.dart';
+import '../../features/add_note/data/data_source/remote_data_source/remote_note_data_source_imp.dart';
+import '../../features/add_note/data/repository_imp/note_repository_imp.dart';
+import '../../features/add_note/domain/repositoy/note_repository.dart';
+import '../../features/add_note/domain/usecase/note_usecase.dart';
+import '../../features/add_note/presentation/bloc/add_note/add_note_cubit.dart';
+import '../../features/add_note/presentation/bloc/delete_note/delete_note_cubit.dart';
+import '../../features/add_note/presentation/bloc/get_note/get_note_cubit.dart';
+import '../../features/add_note/presentation/bloc/update_note/update_note_cubit.dart';
 import '../../features/backup/data/data_source/local/local_data_source.dart';
 import '../../features/backup/data/data_source/local/sqLite_imp.dart';
 import '../../features/buy/data/data_source/data_source.dart';
@@ -51,7 +62,10 @@ void setupLocator() {
   getIt.registerFactory(() => DayWiseCubit(getIt.call()));
   getIt.registerFactory(() => ItemWiseCubit(getIt.call()));
   getIt.registerFactory(() => DashboardCubit(getIt.call()));
-
+  getIt.registerFactory(() => GetNoteCubit(getIt.call()));
+  getIt.registerFactory(() => UpdateNoteCubit(getIt.call()));
+  getIt.registerFactory(() => AddNoteCubit(getIt.call()));
+  getIt.registerFactory(() => DeleteNoteCubit(getIt.call()));
   //use case
   getIt.registerLazySingleton<FetchItemUseCase>(
       () => FetchItemUseCase(getIt.call()));
@@ -62,6 +76,7 @@ void setupLocator() {
       () => RecordsUseCases(getIt.call()));
   getIt.registerLazySingleton<DashboardUsecase>(
       () => DashboardUsecase(getIt.call()));
+  getIt.registerLazySingleton<NoteUsecase>(() => NoteUsecase(getIt.call()));
 
   //repository
   getIt.registerLazySingleton<FetchItemRepo>(
@@ -74,6 +89,8 @@ void setupLocator() {
       () => RecordsRepositoryImp(getIt.call()));
   getIt.registerLazySingleton<DashboardRepo>(
       () => DashboardRepoImp(getIt.call()));
+  getIt.registerLazySingleton<NoteRepository>(
+      () => NoteRepositoryImp(getIt.call(), getIt.call()));
 
   //data source
   getIt.registerLazySingleton<FetchItemDataSource>(
@@ -84,4 +101,8 @@ void setupLocator() {
   getIt.registerLazySingleton<RecordsDataSource>(() => RecordsDataSourceImp());
   getIt.registerLazySingleton<DashboardDataSource>(
       () => DashboardDataSourceImp());
+  getIt.registerLazySingleton<RemoteNoteDataSource>(
+      () => RemoteNoteDataSourceImp());
+  getIt.registerLazySingleton<NoteLocalDataSource>(
+      () => NoteLocalDataSourceImp());
 }

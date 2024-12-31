@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'add_note/presentation/page/notes_list_page.dart';
 import 'backup/presentation/widgets/restore_widget.dart';
 import 'backup/presentation/widgets/upload_widget.dart';
 import 'sell/presentation/pages/sell.dart';
@@ -72,7 +73,7 @@ class _HomePageState extends State<HomePage> {
           title: const Text('Diary'),
           centerTitle: true,
         ),
-        drawer: buildDrawer(),
+        drawer: buildDrawer(context),
         body: SafeArea(
           child: Column(
             children: [
@@ -129,14 +130,27 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Drawer buildDrawer() {
-    return const Drawer(
+  Drawer buildDrawer(BuildContext context) {
+    return Drawer(
       child: Column(
         children: [
-          UploadWidget(),
-          RestoreWidget(),
-          DeleteWidget(),
-          // SaveToDeviceWidget(),
+          const SizedBox(height: 40),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotesListPage(),
+                ),
+              );
+            },
+            child: const Text('Notes', style: TextStyle(color: Colors.white)),
+          ),
+          const Expanded(child: SizedBox()),
+          const UploadWidget(),
+          const RestoreWidget(),
+          const DeleteWidget(),
+          const SizedBox(height: 20),
         ],
       ),
     );
