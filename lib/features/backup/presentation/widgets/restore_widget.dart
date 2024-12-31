@@ -48,42 +48,61 @@ class _RestoreWidgetState extends State<RestoreWidget> {
             );
           });
         }
-        return ElevatedButton(
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: const Text('Restore Data'),
-                    content: const Text(
-                        'Are you sure you want to restore your data?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('No'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          _backupDataCubit.restoreData();
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Yes'),
-                      ),
-                    ],
-                  );
-                });
-          },
-          style: ButtonStyle(
-            backgroundColor: WidgetStatePropertyAll(
-              Theme.of(context).colorScheme.primary,
-            ),
-            foregroundColor: WidgetStatePropertyAll(
-              Theme.of(context).colorScheme.surface,
+        return SizedBox(
+          width: double.infinity,
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 50.0, vertical: 10.0),
+            child: ElevatedButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Restore Data'),
+                        content: const Text(
+                            'Are you sure you want to restore your data?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('No'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              _backupDataCubit.restoreData();
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Yes'),
+                          ),
+                        ],
+                      );
+                    });
+              },
+              style: ButtonStyle(
+                shape: WidgetStatePropertyAll(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                backgroundColor: WidgetStatePropertyAll(
+                  Theme.of(context).colorScheme.primary,
+                ),
+                foregroundColor: WidgetStatePropertyAll(
+                  Theme.of(context).colorScheme.surface,
+                ),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.restore_rounded),
+                  SizedBox(width: 10),
+                  Text('Restore'),
+                ],
+              ),
             ),
           ),
-          child: Text('Restore'),
         );
       },
     );

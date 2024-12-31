@@ -134,24 +134,50 @@ class _HomePageState extends State<HomePage> {
     return Drawer(
       child: Column(
         children: [
-          const SizedBox(height: 40),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const NotesListPage(),
-                ),
-              );
-            },
-            child: const Text('Notes', style: TextStyle(color: Colors.white)),
-          ),
+          const SizedBox(height: 50),
+          _notes(context),
           const Expanded(child: SizedBox()),
           const UploadWidget(),
           const RestoreWidget(),
           const DeleteWidget(),
           const SizedBox(height: 20),
         ],
+      ),
+    );
+  }
+
+  GestureDetector _notes(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const NotesListPage(),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.note_add_rounded,
+                color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 10),
+            Text(
+              'Notes',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
+          ],
+        ),
       ),
     );
   }

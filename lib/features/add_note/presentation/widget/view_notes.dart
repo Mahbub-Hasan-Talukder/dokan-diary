@@ -1,9 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/di/di.dart';
 import '../../domain/entity/note_entity.dart';
 import '../bloc/delete_note/delete_note_cubit.dart';
 import '../bloc/get_note/get_note_cubit.dart';
@@ -43,7 +40,6 @@ class _ViewNotesState extends State<ViewNotes> {
             );
           }
           if (state is GetNoteSuccess) {
-            print('dbg get notes: ${state.notes.length}');
             if (state.notes.isEmpty) {
               return const Center(
                 child: Text('No notes found'),

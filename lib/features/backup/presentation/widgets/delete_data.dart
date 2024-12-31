@@ -18,49 +18,71 @@ class _DeleteWidgetState extends State<DeleteWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text(
-                'Delete Data',
-                style: TextStyle(color: Colors.red),
-              ),
-              content: const Text('Are you sure you want to delete your data?'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('No'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    SqLiteImp().instantDelete();
-                    _itemCubit.fetchItems();
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                    'Yes',
+    return SizedBox(
+      width: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 50.0),
+        child: ElevatedButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text(
+                    'Delete Data',
                     style: TextStyle(color: Colors.red),
                   ),
-                ),
-              ],
+                  content:
+                      const Text('Are you sure you want to delete your data?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('No'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        SqLiteImp().instantDelete();
+                        _itemCubit.fetchItems();
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text(
+                        'Yes',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           },
-        );
-      },
-      style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(
-          Theme.of(context).colorScheme.primary,
-        ),
-        foregroundColor: WidgetStatePropertyAll(
-          Theme.of(context).colorScheme.surface,
+          style: ButtonStyle(
+            shape: WidgetStatePropertyAll(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            backgroundColor: WidgetStatePropertyAll(
+              Theme.of(context).colorScheme.primary,
+            ),
+            foregroundColor: WidgetStatePropertyAll(
+              Theme.of(context).colorScheme.surface,
+            ),
+          ),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.delete_rounded),
+              SizedBox(width: 10),
+              Text(
+                'Delete',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
         ),
       ),
-      child: const Text('Delete'),
     );
   }
 }

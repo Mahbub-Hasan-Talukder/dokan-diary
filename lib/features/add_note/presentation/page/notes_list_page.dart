@@ -48,7 +48,7 @@ class _NotesListPageState extends State<NotesListPage> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text('Note Page'),
+        title: const Text('Notes'),
         centerTitle: true,
       ),
       body: SafeArea(
