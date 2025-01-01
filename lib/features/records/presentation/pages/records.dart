@@ -183,6 +183,7 @@ class _RecordsState extends State<Records> {
           queryType: snapshot.data?.queryType ?? QueryTypes.calender,
           targetAttribute:
               snapshot.data?.targetAttribute ?? TargetAttribute.date,
+          dateRange: snapshot.data?.dateRange,
         ));
       },
       child: ((snapshot.data?.sortingOrder ?? SortingOrder.descending) ==

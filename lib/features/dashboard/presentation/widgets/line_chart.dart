@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/services/date_time_format.dart';
 import '../../../records/domain/entities/day_wise_entity.dart';
 
 class LineChartSample1 extends StatefulWidget {
@@ -30,66 +33,61 @@ class LineChartSample1State extends State<LineChartSample1> {
         .map((e) => ((e.totalSell ?? 0) - (e.purchaseCost ?? 0)))
         .toList();
     List<String> dates = widget.records.map((e) => e.date ?? '').toList();
-    return AspectRatio(
-      aspectRatio: 1.23,
-      child: Stack(
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const SizedBox(
-                height: 37,
-              ),
-              const Text(
-                'Sales Chart',
-                style: TextStyle(
-                  color: Colors.blueGrey,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 37,
-              ),
-              SizedBox(
-                width: 300,
-                height: 200,
-                child: Card(
-                  elevation: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16, left: 6),
-                    child: _MyLineChart(
-                      isShowingMainData: isShowingMainData,
-                      dataWrapper: _DataWrapper(
-                        purchaseCost,
-                        totalSell,
-                        profit,
-                        dates,
-                      ),
+    // double maxPurchase = purchaseCost.reduce((a, b) => a > b ? a : b);
+    double maxSell = totalSell.reduce((a, b) => a > b ? a : b);
+    // for (var i = 0; i < dates.length; i++) {
+    //   print(
+    //       'dbg ${(purchaseCost[i] / maxSell) * 5}  ${(totalSell[i] / maxSell) * 5}');
+    // }
+    double size = MediaQuery.of(context).size.width;
+    print('dbg ${widget.records.length}');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const SizedBox(
+          height: 37,
+        ),
+        const Text(
+          'Sales Chart',
+          style: TextStyle(
+            color: Colors.blueGrey,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(
+          height: 37,
+        ),
+        Card(
+          child: SizedBox(
+            height: size * 0.6,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16, left: 6, top: 10),
+                child: Container(
+                  width: widget.records.length * 60.0,
+                  child: _MyLineChart(
+                    isShowingMainData: isShowingMainData,
+                    dataWrapper: _DataWrapper(
+                      purchaseCost,
+                      totalSell,
+                      profit,
+                      dates,
+                      maxSell,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
-            ],
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.refresh,
-              color: Colors.white.withOpacity(isShowingMainData ? 1.0 : 0.5),
             ),
-            onPressed: () {
-              setState(() {
-                isShowingMainData = !isShowingMainData;
-              });
-            },
-          )
-        ],
-      ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+      ],
     );
   }
 }
@@ -139,7 +137,7 @@ class _MyLineChart extends StatelessWidget {
   //     );
 
   LineTouchData get lineTouchData1 => LineTouchData(
-        handleBuiltInTouches: true,
+        handleBuiltInTouches: false,
         touchTooltipData: LineTouchTooltipData(
           getTooltipColor: (touchedSpot) =>
               const Color.fromARGB(255, 209, 210, 211).withOpacity(0.8),
@@ -162,9 +160,21 @@ class _MyLineChart extends StatelessWidget {
       );
 
   List<LineChartBarData> lineBarsData1(_DataWrapper dataWrapper) => [
-        lineChartBarData1_1(dataWrapper.dates, dataWrapper.totalSell),
-        lineChartBarData1_2(dataWrapper.dates, dataWrapper.purchaseCost),
-        lineChartBarData1_3(dataWrapper.dates, dataWrapper.profit),
+        lineChartBarData1_1(
+          dataWrapper.dates,
+          dataWrapper.totalSell,
+          dataWrapper.maxSell,
+        ),
+        lineChartBarData1_2(
+          dataWrapper.dates,
+          dataWrapper.purchaseCost,
+          dataWrapper.maxSell,
+        ),
+        lineChartBarData1_3(
+          dataWrapper.dates,
+          dataWrapper.profit,
+          dataWrapper.maxSell,
+        ),
       ];
 
   // LineTouchData get lineTouchData2 => const LineTouchData(
@@ -199,20 +209,20 @@ class _MyLineChart extends StatelessWidget {
     );
     String text;
     switch (value.toInt()) {
-      case 1:
-        text = '1m';
-        break;
-      case 2:
-        text = '2m';
-        break;
-      case 3:
-        text = '3m';
+      case 5:
+        text = 'H';
         break;
       case 4:
-        text = '4m';
+        text = 'M2';
         break;
-      case 5:
-        text = '5m';
+      case 3:
+        text = 'M1';
+        break;
+      case 2:
+        text = 'L2';
+        break;
+      case 1:
+        text = 'L1';
         break;
       default:
         return Container();
@@ -234,9 +244,7 @@ class _MyLineChart extends StatelessWidget {
       fontSize: 16,
     );
 
-    if (value.toInt() == -1 ||
-        value.toInt() ~/ 4 == readyDatesForChart.length ||
-        value.toInt() % 4 != 0) {
+    if (value.toInt() == -1 || value.toInt() == readyDatesForChart.length) {
       return SideTitleWidget(
         axisSide: meta.axisSide,
         space: 10,
@@ -244,9 +252,13 @@ class _MyLineChart extends StatelessWidget {
       );
     }
 
-    int index = value.toInt() ~/ 4;
+    int index = value.toInt();
 
-    Widget text = Text(readyDatesForChart[index]);
+    Widget text = Text(
+      DateTimeFormat.getPrettyDate(
+        DateTime.parse(readyDatesForChart[index]),
+      ).substring(0, 6),
+    );
 
     return SideTitleWidget(
       axisSide: meta.axisSide,
@@ -275,15 +287,14 @@ class _MyLineChart extends StatelessWidget {
       );
 
   LineChartBarData lineChartBarData1_1(
-      List<String> dates, List<double> totalSell) {
+      List<String> dates, List<double> totalSell, double maxSell) {
     int initialDay = totalDays(DateTime.parse(dates[0]));
     List<int> days =
         dates.map((e) => totalDays(DateTime.parse(e)) - initialDay).toList();
-    double maxSell = totalSell.reduce((a, b) => a > b ? a : b);
     List<double> sell = totalSell.map((e) => (e / maxSell) * 5).toList();
     return LineChartBarData(
       isCurved: true,
-      color: Colors.green,
+      color: Colors.blue,
       barWidth: 8,
       isStrokeCapRound: true,
       dotData: const FlDotData(show: false),
@@ -291,7 +302,7 @@ class _MyLineChart extends StatelessWidget {
       spots: List.generate(
         days.length,
         (index) => FlSpot(
-          2 * days[index].toDouble() - 1,
+          days[index].toDouble(),
           sell[index],
         ),
       ),
@@ -299,13 +310,11 @@ class _MyLineChart extends StatelessWidget {
   }
 
   LineChartBarData lineChartBarData1_2(
-      List<String> dates, List<double> purchaseCost) {
+      List<String> dates, List<double> purchaseCost, double maxSell) {
     int initialDay = totalDays(DateTime.parse(dates[0]));
     List<int> days =
         dates.map((e) => totalDays(DateTime.parse(e)) - initialDay).toList();
-    double maxPurchase = purchaseCost.reduce((a, b) => a > b ? a : b);
-    List<double> purchase =
-        purchaseCost.map((e) => (e / maxPurchase) * 5).toList();
+    List<double> purchase = purchaseCost.map((e) => (e / maxSell) * 5).toList();
     return LineChartBarData(
       isCurved: true,
       color: Colors.orange,
@@ -319,7 +328,7 @@ class _MyLineChart extends StatelessWidget {
       spots: List.generate(
         days.length,
         (index) => FlSpot(
-          2 * days[index].toDouble() - 1,
+          days[index].toDouble(),
           purchase[index],
         ),
       ),
@@ -327,15 +336,14 @@ class _MyLineChart extends StatelessWidget {
   }
 
   LineChartBarData lineChartBarData1_3(
-      List<String> dates, List<double> profits) {
+      List<String> dates, List<double> profits, double maxSell) {
     int initialDay = totalDays(DateTime.parse(dates[0]));
     List<int> days =
         dates.map((e) => totalDays(DateTime.parse(e)) - initialDay).toList();
-    double maxProfit = profits.reduce((a, b) => a > b ? a : b);
-    List<double> newProfit = profits.map((e) => (e / maxProfit) * 5).toList();
+    List<double> newProfit = profits.map((e) => (e / maxSell) * 5).toList();
     return LineChartBarData(
       isCurved: true,
-      color: Colors.blue,
+      color: Colors.green,
       barWidth: 8,
       isStrokeCapRound: true,
       dotData: const FlDotData(show: false),
@@ -343,7 +351,7 @@ class _MyLineChart extends StatelessWidget {
       spots: List.generate(
         days.length,
         (index) => FlSpot(
-          2 * days[index].toDouble() - 1,
+          days[index].toDouble(),
           newProfit[index],
         ),
       ),
@@ -415,6 +423,13 @@ class _DataWrapper {
   final List<double> totalSell;
   final List<double> profit;
   final List<String> dates;
+  final double maxSell;
 
-  _DataWrapper(this.purchaseCost, this.totalSell, this.profit, this.dates);
+  _DataWrapper(
+    this.purchaseCost,
+    this.totalSell,
+    this.profit,
+    this.dates,
+    this.maxSell,
+  );
 }
