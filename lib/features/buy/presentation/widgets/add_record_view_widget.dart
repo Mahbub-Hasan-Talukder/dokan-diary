@@ -357,6 +357,7 @@ class AddRecordViewState extends State<AddRecordView> {
                 // widget.fetchItemCubit.fetchItems();
                 widget.fetchItemCubit.updateItem(
                   itemId: newId,
+                  itemOldId: _selectedId ?? '',
                   unitPrice: unitPrice,
                   quantity: itemQuantity ?? 0,
                   itemName: _selectedItem ?? 'no item name',

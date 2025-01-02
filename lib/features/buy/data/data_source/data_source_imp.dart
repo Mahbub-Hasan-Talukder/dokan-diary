@@ -160,16 +160,16 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
   Future<List<Map<String, dynamic>>> updateItemNew(
       {required UpdateRequestEntity entity}) async {
     try {
-      if (await isItemExistInFirestore(itemId: entity.itemId)) {
+      if (await isItemExistInFirestore(itemId: entity.itemOldId)) {
         await FirebaseFirestore.instance
             .collection('Items')
-            .doc(entity.itemId.replaceAll('/', '-'))
+            .doc(entity.itemOldId.replaceAll('/', '-'))
             .delete();
       }
       _db ??= await dbHelper.database;
       if (_db != null) {
-        await _db!
-            .delete('Items', where: 'item_id = ?', whereArgs: [entity.itemId]);
+        await _db!.delete('Items',
+            where: 'item_id = ?', whereArgs: [entity.itemOldId]);
         await _db!.insert('Items', entity.toJson());
       }
       return await fetchItems();

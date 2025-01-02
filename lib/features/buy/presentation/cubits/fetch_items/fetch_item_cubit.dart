@@ -58,6 +58,7 @@ class FetchItemCubit extends Cubit<FetchItemState> {
 
   void updateItem({
     required String itemId,
+    required String itemOldId,
     required double unitPrice,
     required double quantity,
     required String itemName,
@@ -65,6 +66,7 @@ class FetchItemCubit extends Cubit<FetchItemState> {
   }) async {
     UpdateRequestEntity entity = UpdateRequestEntity(
       itemId: itemId,
+      itemOldId: itemOldId,
       unitPrice: unitPrice,
       quantity: quantity,
       itemName: itemName,

@@ -4,6 +4,7 @@ class UpdateRequestEntity {
   double quantity;
   String itemName;
   String unitType;
+  String itemOldId;
 
   UpdateRequestEntity({
     required this.itemId,
@@ -11,6 +12,7 @@ class UpdateRequestEntity {
     required this.quantity,
     required this.itemName,
     required this.unitType,
+    required this.itemOldId,
   });
 
   Map<String, dynamic> toJson() {
