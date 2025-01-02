@@ -23,6 +23,20 @@ class _SellState extends State<Sell> {
   final UndoRecordCubit _undoRecordCubit = getIt.get<UndoRecordCubit>();
   final BehaviorSubject<DateTime> dateStream =
       BehaviorSubject.seeded(DateTime.now());
+  final List<IconData> _icons = [
+    Icons.hardware_outlined,
+    Icons.pin_invoke_outlined,
+    Icons.iron_outlined,
+    Icons.color_lens_outlined,
+    Icons.tungsten_outlined,
+  ];
+  final List<Color> _colors = [
+    Colors.black,
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.purple,
+  ];
   late ScrollController _scrollController;
 
   @override
@@ -109,47 +123,59 @@ class _SellState extends State<Sell> {
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
-          return ListTile(
-            tileColor: Colors.grey.shade300,
-            leading: const Icon(Icons.hardware),
-            title: Text(item.itemName ?? 'N/A'),
-            subtitle: Text(
-              'Profit: ${item.profit?.toStringAsFixed(2)} tk',
-              style: TextStyle(
-                color: ((item.profit ?? 0) < 0)
-                    ? Colors.red.shade800
-                    : Colors.green.shade800,
+          final iconIndex = index % _icons.length;
+          final colorIndex = index % _colors.length;
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: ListTile(
+              tileColor: Colors.grey.shade300,
+              leading: Icon(
+                _icons[iconIndex],
+                color: _colors[colorIndex],
               ),
-            ),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Q: ${item.quantitySold?.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.labelLarge,
+              title: Text(item.itemName ?? 'N/A'),
+              subtitle: Text(
+                'Profit: ${item.profit?.toStringAsFixed(2)} tk',
+                style: TextStyle(
+                  color: ((item.profit ?? 0) < 0)
+                      ? Colors.red.shade800
+                      : Colors.green.shade800,
                 ),
-                Text(
-                  'TP: ${item.totalPrice?.toStringAsFixed(2)} tk',
-                  style: Theme.of(context).textTheme.labelLarge,
-                )
-              ],
+              ),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Q: ${item.quantitySold?.toStringAsFixed(2)}',
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  Text(
+                    'TP: ${item.totalPrice?.toStringAsFixed(2)} tk',
+                    style: Theme.of(context).textTheme.labelLarge,
+                  )
+                ],
+              ),
+              onLongPress: () {
+                if (item.saleId != null &&
+                    item.quantitySold != null &&
+                    item.itemId != null) {
+                  Scaffold.of(context).showBottomSheet(
+                    (context) {
+                      return modalSheetView(
+                        context: context,
+                        saleId: item.saleId!,
+                        quantitySold: item.quantitySold!,
+                        itemId: item.itemId!,
+                      );
+                    },
+                  );
+                }
+              },
             ),
-            onLongPress: () {
-              if (item.saleId != null &&
-                  item.quantitySold != null &&
-                  item.itemId != null) {
-                Scaffold.of(context).showBottomSheet(
-                  (context) {
-                    return modalSheetView(
-                      context: context,
-                      saleId: item.saleId!,
-                      quantitySold: item.quantitySold!,
-                      itemId: item.itemId!,
-                    );
-                  },
-                );
-              }
-            },
           );
         },
         separatorBuilder: (BuildContext context, int index) {

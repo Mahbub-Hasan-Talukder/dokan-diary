@@ -40,7 +40,6 @@ class LineChartSample1State extends State<LineChartSample1> {
     //       'dbg ${(purchaseCost[i] / maxSell) * 5}  ${(totalSell[i] / maxSell) * 5}');
     // }
     double size = MediaQuery.of(context).size.width;
-    print('dbg ${widget.records.length}');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -161,18 +160,20 @@ class _MyLineChart extends StatelessWidget {
 
   List<LineChartBarData> lineBarsData1(_DataWrapper dataWrapper) => [
         lineChartBarData1_1(
-          dataWrapper.dates,
-          dataWrapper.totalSell,
+          dataWrapper.dates.sublist(0, min(30, dataWrapper.dates.length)),
+          dataWrapper.totalSell
+              .sublist(0, min(30, dataWrapper.totalSell.length)),
           dataWrapper.maxSell,
         ),
         lineChartBarData1_2(
-          dataWrapper.dates,
-          dataWrapper.purchaseCost,
+          dataWrapper.dates.sublist(0, min(30, dataWrapper.dates.length)),
+          dataWrapper.purchaseCost
+              .sublist(0, min(30, dataWrapper.purchaseCost.length)),
           dataWrapper.maxSell,
         ),
         lineChartBarData1_3(
-          dataWrapper.dates,
-          dataWrapper.profit,
+          dataWrapper.dates.sublist(0, min(30, dataWrapper.dates.length)),
+          dataWrapper.profit.sublist(0, min(30, dataWrapper.profit.length)),
           dataWrapper.maxSell,
         ),
       ];
@@ -235,7 +236,7 @@ class _MyLineChart extends StatelessWidget {
         getTitlesWidget: leftTitleWidgets,
         showTitles: true,
         interval: 1,
-        reservedSize: 40,
+        reservedSize: 30,
       );
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
@@ -247,7 +248,7 @@ class _MyLineChart extends StatelessWidget {
     if (value.toInt() == -1 || value.toInt() == readyDatesForChart.length) {
       return SideTitleWidget(
         axisSide: meta.axisSide,
-        space: 10,
+        space: 0,
         child: const Text(''),
       );
     }
@@ -262,7 +263,7 @@ class _MyLineChart extends StatelessWidget {
 
     return SideTitleWidget(
       axisSide: meta.axisSide,
-      space: 10,
+      space: 5,
       child: text,
     );
   }
@@ -280,9 +281,9 @@ class _MyLineChart extends StatelessWidget {
         show: true,
         border: Border(
           bottom: BorderSide(color: Colors.blueGrey.withOpacity(0.2), width: 4),
-          left: const BorderSide(color: Colors.transparent),
-          right: const BorderSide(color: Colors.transparent),
-          top: const BorderSide(color: Colors.transparent),
+          left: BorderSide.none,
+          right: BorderSide.none,
+          top: BorderSide.none,
         ),
       );
 

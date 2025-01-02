@@ -24,7 +24,7 @@ class NoteRepositoryImp extends NoteRepository {
   @override
   Future<Either<String, String>> deleteNote(int id) async {
     try {
-      await noteRemoteDataSource.deleteNote(id);
+      // await noteRemoteDataSource.deleteNote(id);
       await noteLocalDataSource.deleteNote(id);
       return right('Note deleted successfully');
     } catch (e) {
@@ -46,7 +46,7 @@ class NoteRepositoryImp extends NoteRepository {
   @override
   Future<Either<String, String>> updateNote(NoteEntity note) async {
     try {
-      await noteRemoteDataSource.updateNote(note.id ?? 0, note.toJson());
+      // await noteRemoteDataSource.updateNote(note.id ?? 0, note.toJson());
       await noteLocalDataSource.updateNote(note.id ?? 0, note.toJson());
       return right('Note updated successfully');
     } catch (e) {

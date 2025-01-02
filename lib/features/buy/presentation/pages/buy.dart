@@ -16,6 +16,20 @@ class Buy extends StatefulWidget {
 class _BuyState extends State<Buy> {
   final FetchItemCubit _fetchItemCubit = getIt.get<FetchItemCubit>();
   late ScrollController _scrollController;
+  final List<IconData> _icons = [
+    Icons.hardware_outlined,
+    Icons.pin_invoke_outlined,
+    Icons.iron_outlined,
+    Icons.color_lens_outlined,
+    Icons.tungsten_outlined,
+  ];
+  final List<Color> _colors = [
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.orange,
+    Colors.purple,
+  ];
 
   @override
   void initState() {
@@ -86,6 +100,7 @@ class _BuyState extends State<Buy> {
 
   Widget buildListView(FetchItemSuccess state) {
     final items = state.items.reversed.toList();
+
     if (items.isEmpty) {
       return const Text('No data');
     }
@@ -103,30 +118,48 @@ class _BuyState extends State<Buy> {
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
-          return ListTile(
-            tileColor: Colors.grey.shade300,
-            leading: const Icon(Icons.hardware),
-            title: Text(item.itemName ?? 'N/A'),
-            subtitle: Text('Unit P: ${item.unitPrice?.toStringAsFixed(2)} tk'),
-            trailing: Text(
-              '${item.quantity?.toStringAsFixed(2)}\n units',
-              style: Theme.of(context).textTheme.labelLarge,
+          final iconIndex = index % _icons.length;
+          final colorIndex = index % _colors.length;
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey.shade300),
             ),
-            onLongPress: () {
-              Scaffold.of(context).showBottomSheet(
-                (context) {
-                  return modalSheetView(
-                    context,
-                    item.id ?? 'N/A',
-                    item.unitPrice.toString(),
-                  );
-                },
-              );
-            },
+            child: ListTile(
+              leading: Icon(
+                _icons[iconIndex],
+                color: _colors[colorIndex],
+              ),
+              title: Text(
+                item.itemName ?? 'N/A',
+                // style: TextStyle(color: _colors[colorIndex]),
+              ),
+              subtitle: Text(
+                'Unit P: ${item.unitPrice?.toStringAsFixed(2)} tk',
+                // style: TextStyle(color: _colors[colorIndex]),
+              ),
+              trailing: Text(
+                '${item.quantity?.toStringAsFixed(2)}\n units',
+                style: Theme.of(context).textTheme.labelMedium,
+                // style: TextStyle(color: _colors[colorIndex]),
+              ),
+              onLongPress: () {
+                Scaffold.of(context).showBottomSheet(
+                  (context) {
+                    return modalSheetView(
+                      context,
+                      item.id ?? 'N/A',
+                      item.unitPrice.toString(),
+                    );
+                  },
+                );
+              },
+            ),
           );
         },
         separatorBuilder: (BuildContext context, int index) {
-          return const SizedBox(height: 5);
+          return const SizedBox(height: 4);
         },
       ),
     );

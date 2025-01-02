@@ -5,6 +5,7 @@ import 'package:sqflite/sqflite.dart';
 
 import '../../../../core/database/database_helper.dart';
 import '../../../../core/di/di.dart';
+import '../../domain/entities/update_request_entity.dart';
 import 'data_source.dart';
 
 class FetchItemDataSourceImpl implements FetchItemDataSource {
@@ -111,7 +112,12 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
   @override
   Future<void> deleteFromFirestore({required String itemId}) async {
     try {
-      await FirebaseFirestore.instance.collection('Items').doc(itemId).delete();
+      if (await isItemExistInFirestore(itemId: itemId)) {
+        await FirebaseFirestore.instance
+            .collection('Items')
+            .doc(itemId.replaceAll('/', '-'))
+            .delete();
+      }
     } catch (e) {
       throw Exception(e);
     }
@@ -124,12 +130,51 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
     required double quantity,
   }) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('Items')
-          .doc(itemId)
-          .update({'item_unit_price': unitPrice, 'item_quantity': quantity});
+      if (await isItemExistInFirestore(itemId: itemId)) {
+        await FirebaseFirestore.instance
+            .collection('Items')
+            .doc(itemId.replaceAll('/', '-'))
+            .update(
+          {'item_unit_price': unitPrice, 'item_quantity': quantity},
+        );
+      }
+      return;
     } catch (e) {
       throw Exception(e);
+    }
+  }
+
+  Future<bool> isItemExistInFirestore({required String itemId}) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('Items')
+          .doc(itemId.replaceAll('/', '-'))
+          .get();
+      return doc.exists;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> updateItemNew(
+      {required UpdateRequestEntity entity}) async {
+    try {
+      if (await isItemExistInFirestore(itemId: entity.itemId)) {
+        await FirebaseFirestore.instance
+            .collection('Items')
+            .doc(entity.itemId.replaceAll('/', '-'))
+            .delete();
+      }
+      _db ??= await dbHelper.database;
+      if (_db != null) {
+        await _db!
+            .delete('Items', where: 'item_id = ?', whereArgs: [entity.itemId]);
+        await _db!.insert('Items', entity.toJson());
+      }
+      return await fetchItems();
+    } catch (e) {
+      throw Exception('Failed to update item: ${e.toString()}');
     }
   }
 }

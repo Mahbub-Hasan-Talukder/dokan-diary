@@ -23,9 +23,8 @@ class DatabaseHelper {
     final path = join(dbPath, 'app_database.db');
     return await openDatabase(
       path,
-      version: 2, // Increment the version to trigger onUpgrade
+      version: 1,
       onCreate: _onCreate,
-      onUpgrade: _onUpgrade, // Add this for schema migrations
     );
   }
 
@@ -52,12 +51,9 @@ class DatabaseHelper {
         FOREIGN KEY (item_id) REFERENCES Items (item_id) ON DELETE CASCADE
       )
     ''');
-  }
 
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      // Add the Notes table
-      await db.execute('''
+    // Add the Notes table
+    await db.execute('''
         CREATE TABLE Notes (
           note_id INTEGER PRIMARY KEY AUTOINCREMENT,
           note_title TEXT NOT NULL,
@@ -65,7 +61,6 @@ class DatabaseHelper {
           created_at TEXT NOT NULL
         )
       ''');
-    }
   }
 
   Future<void> close() async {

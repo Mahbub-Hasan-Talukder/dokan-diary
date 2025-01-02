@@ -20,7 +20,10 @@ class RemoteNoteDataSourceImp implements RemoteNoteDataSource {
       final snapshot =
           await _firestore.collection('Notes').doc(id.toString()).get();
       if (snapshot.exists) {
-        await _firestore.collection('Notes').doc(id.toString()).delete();
+        await _firestore
+            .collection('Notes')
+            .doc(id.toString().replaceAll('/', '-'))
+            .delete();
       } else {
         return;
       }
@@ -35,7 +38,10 @@ class RemoteNoteDataSourceImp implements RemoteNoteDataSource {
       final docSnapshot =
           await _firestore.collection('Notes').doc(id.toString()).get();
       if (docSnapshot.exists) {
-        await _firestore.collection('Notes').doc(id.toString()).update(note);
+        await _firestore
+            .collection('Notes')
+            .doc(id.toString().replaceAll('/', '-'))
+            .update(note);
       } else {
         return;
       }
