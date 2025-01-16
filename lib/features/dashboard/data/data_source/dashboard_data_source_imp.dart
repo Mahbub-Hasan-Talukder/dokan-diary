@@ -18,7 +18,12 @@ class DashboardDataSourceImp implements DashboardDataSource {
   @override
   Future<void> deleteItem(String itemId) async {
     try {
-      await firebaseFirestore.collection('Items').doc(itemId).delete();
+      if (await doesItemExistInFirestore(itemId)) {
+        await firebaseFirestore
+            .collection('Items')
+            .doc(itemId.replaceAll('/', '-'))
+            .delete();
+      }
 
       _db ??= await dbHelper.database;
       if (_db != null) {
@@ -57,10 +62,15 @@ class DashboardDataSourceImp implements DashboardDataSource {
 
     // Execute the update query
     try {
-      await firebaseFirestore.collection('Items').doc(itemId).update({
-        'item_unit_price': newUnitPrice,
-        'item_quantity': newQuantity,
-      });
+      if (await doesItemExistInFirestore(itemId)) {
+        await firebaseFirestore
+            .collection('Items')
+            .doc(itemId.replaceAll('/', '-'))
+            .update({
+          'item_unit_price': newUnitPrice,
+          'item_quantity': newQuantity,
+        });
+      }
 
       await _db!.rawUpdate(
         '''
@@ -75,6 +85,18 @@ class DashboardDataSourceImp implements DashboardDataSource {
       );
     } catch (e) {
       throw Exception('Failed to update item: ${e.toString()}');
+    }
+  }
+
+  Future<bool> doesItemExistInFirestore(String itemId) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('Items')
+          .doc(itemId.replaceAll('/', '-'))
+          .get();
+      return doc.exists;
+    } catch (e) {
+      return false;
     }
   }
 }

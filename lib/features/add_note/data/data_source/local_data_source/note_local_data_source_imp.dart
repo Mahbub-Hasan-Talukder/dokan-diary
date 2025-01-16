@@ -12,7 +12,6 @@ class NoteLocalDataSourceImp implements NoteLocalDataSource {
   Future<void> addNote(Map<String, dynamic> note) async {
     try {
       _db ??= await dbHelper.database;
-      await Future.delayed(const Duration(seconds: 1));
       await _db!.insert('Notes', note);
     } catch (e) {
       throw Exception('Failed to add note');
@@ -25,7 +24,7 @@ class NoteLocalDataSourceImp implements NoteLocalDataSource {
       _db ??= await dbHelper.database;
       return await _db!.query('Notes');
     } catch (e) {
-      throw Exception('Failed to get notes');
+      throw Exception('Failed to get notes: ${e.toString()}');
     }
   }
 
@@ -35,7 +34,7 @@ class NoteLocalDataSourceImp implements NoteLocalDataSource {
       _db ??= await dbHelper.database;
       await _db!.delete('Notes', where: 'note_id = ?', whereArgs: [id]);
     } catch (e) {
-      throw Exception('Failed to delete note');
+      throw Exception('Failed to delete note: ${e.toString()}');
     }
   }
 
@@ -45,7 +44,7 @@ class NoteLocalDataSourceImp implements NoteLocalDataSource {
       _db ??= await dbHelper.database;
       await _db!.update('Notes', note, where: 'note_id = ?', whereArgs: [id]);
     } catch (e) {
-      throw Exception(e.toString());
+      throw Exception('Failed to update note: ${e.toString()}');
     }
   }
 }

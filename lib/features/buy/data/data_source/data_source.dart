@@ -1,4 +1,5 @@
 import '../../domain/entities/add_request_entity.dart';
+import '../../domain/entities/update_request_entity.dart';
 
 abstract class FetchItemDataSource {
   Future<List<Map<String, dynamic>>> fetchItems();
@@ -12,4 +13,6 @@ abstract class FetchItemDataSource {
     required double unitPrice,
     required double quantity,
   });
+  Future<List<Map<String, dynamic>>> updateItemNew(
+      {required UpdateRequestEntity entity});
 }

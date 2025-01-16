@@ -48,7 +48,7 @@ class _DayWiseRecordsViewState extends State<DayWiseRecordsView> {
             return const Center(child: Text('No data found'));
           }
 
-          return buildListView(state.records);
+          return buildListView(state.records.reversed.toList());
         }
         return const SizedBox.shrink();
       },

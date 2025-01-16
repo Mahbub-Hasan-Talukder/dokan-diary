@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:diary/features/buy/domain/entities/add_request_entity.dart';
 
 import '../../domain/entities/item_entity.dart';
+import '../../domain/entities/update_request_entity.dart';
 import '../../domain/repository/fetch_item_repo.dart';
 import '../data_source/data_source.dart';
 import '../models/item_model.dart';
@@ -62,6 +63,20 @@ class FetchItemRepoImp implements FetchItemRepo {
       return const Right("Item doesn't exists");
     } catch (e) {
       return Right(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<List<ItemEntity>, String>> updateItem(
+      {required UpdateRequestEntity entity}) async {
+    try {
+      final response = await fetchItemDataSource.updateItemNew(entity: entity);
+      final res = response.map((json) {
+        return ItemModel.fromJson(json).toEntity();
+      }).toList();
+      return Left(res);
+    } catch (e) {
+      return Right('Failed to update item: ${e.toString()}');
     }
   }
 }

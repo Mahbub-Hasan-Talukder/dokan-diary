@@ -81,6 +81,28 @@ class SellDataSourceImp implements SellDataSource {
 
   @override
   Future<void> deleteSellFromFirestore(String saleId) async {
-    await FirebaseFirestore.instance.collection('Sales').doc(saleId).delete();
+    try {
+      if (await isSaleExistInFirestore(saleId)) {
+        await FirebaseFirestore.instance
+            .collection('Sales')
+            .doc(saleId.replaceAll('/', '-'))
+            .delete();
+      }
+      return;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<bool> isSaleExistInFirestore(String saleId) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('Sales')
+          .doc(saleId.replaceAll('/', '-'))
+          .get();
+      return doc.exists;
+    } catch (e) {
+      return false;
+    }
   }
 }

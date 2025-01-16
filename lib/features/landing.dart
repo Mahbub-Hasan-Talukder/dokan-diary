@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Diary'),
+          title: const Text('Shop Diary'),
           centerTitle: true,
         ),
         drawer: buildDrawer(context),

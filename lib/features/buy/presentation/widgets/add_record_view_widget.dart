@@ -100,7 +100,7 @@ class AddRecordViewState extends State<AddRecordView> {
   SizedBox _add(BuildContext context) {
     return SizedBox(
       width: 130,
-      height: 60,
+      height: 50,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.primary,
@@ -133,8 +133,8 @@ class AddRecordViewState extends State<AddRecordView> {
 
   SizedBox _edit(BuildContext context) {
     return SizedBox(
-      width: 110,
-      height: 50,
+      width: 100,
+      height: 45,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.primary,
@@ -160,8 +160,8 @@ class AddRecordViewState extends State<AddRecordView> {
 
   SizedBox _delete(BuildContext context) {
     return SizedBox(
-      width: 110,
-      height: 50,
+      width: 100,
+      height: 45,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.primary,
@@ -345,14 +345,24 @@ class AddRecordViewState extends State<AddRecordView> {
                 //   quantity: itemQuantity ?? 0,
                 // );
                 _selectedItem = _itemNameController.text;
-                widget.fetchItemCubit.deleteItem(itemId: _selectedId ?? '');
-                widget.fetchItemCubit.addItems(
-                  itemName: _selectedItem ?? 'aba',
-                  unitType: 'kg',
+                String newId =
+                    '${_selectedItem}_${unitPrice.toStringAsFixed(2)}';
+                // widget.fetchItemCubit.deleteItem(itemId: _selectedId ?? '');
+                // widget.fetchItemCubit.addItems(
+                //   itemName: _selectedItem ?? 'no item name',
+                //   unitType: 'kg',
+                //   unitPrice: unitPrice,
+                //   itemQuantity: itemQuantity ?? 0,
+                // );
+                // widget.fetchItemCubit.fetchItems();
+                widget.fetchItemCubit.updateItem(
+                  itemId: newId,
+                  itemOldId: _selectedId ?? '',
                   unitPrice: unitPrice,
-                  itemQuantity: itemQuantity ?? 0,
+                  quantity: itemQuantity ?? 0,
+                  itemName: _selectedItem ?? 'no item name',
+                  unitType: 'kg',
                 );
-                widget.fetchItemCubit.fetchItems();
               });
               Navigator.of(context).pop();
             },

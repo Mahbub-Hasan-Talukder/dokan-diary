@@ -3,6 +3,7 @@ import 'package:diary/features/buy/domain/entities/add_request_entity.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/item_entity.dart';
+import '../../../domain/entities/update_request_entity.dart';
 import '../../../domain/use_cases/fetch_item_use_case.dart';
 
 part 'fetch_item_state.dart';
@@ -52,6 +53,30 @@ class FetchItemCubit extends Cubit<FetchItemState> {
       emit(DeleteItemSuccess(success: success));
     }, (error) {
       emit(DeleteItemError(error));
+    });
+  }
+
+  void updateItem({
+    required String itemId,
+    required String itemOldId,
+    required double unitPrice,
+    required double quantity,
+    required String itemName,
+    required String unitType,
+  }) async {
+    UpdateRequestEntity entity = UpdateRequestEntity(
+      itemId: itemId,
+      itemOldId: itemOldId,
+      unitPrice: unitPrice,
+      quantity: quantity,
+      itemName: itemName,
+      unitType: unitType,
+    );
+    final result = await fetchItemUseCase.update(entity: entity);
+    result.fold((items) {
+      emit(FetchItemSuccess(items: items));
+    }, (error) {
+      emit(FetchItemError(error));
     });
   }
 }
