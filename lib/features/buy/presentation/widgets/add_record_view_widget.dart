@@ -1,3 +1,4 @@
+import 'package:diary/features/buy/data/data_source/data_source_imp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -22,17 +23,19 @@ class AddRecordViewState extends State<AddRecordView> {
   final _formKey = GlobalKey<FormState>();
   final _itemNameController = TextEditingController();
   final _quantityController = TextEditingController();
-  final _unitPriceController = TextEditingController();
+  final _totalPriceCrontroller = TextEditingController();
   String? _selectedUnit;
   String? _selectedItem;
+  String? _selectedId;
+  double quantityHintValue = 0;
+  double priceHintValue = 0;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.grey.shade200,
-      height: MediaQuery.of(context).size.height * .25,
+      height: MediaQuery.of(context).size.height * .22,
       width: MediaQuery.of(context).size.width,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       child: Form(
         key: _formKey,
         child: formElements(context),
@@ -51,52 +54,129 @@ class AddRecordViewState extends State<AddRecordView> {
                 child: itemNameInput(),
               ),
               const SizedBox(height: 10),
-              Flexible(
-                flex: 1,
-                child: numericTextField(_quantityController, 'quantity'),
-              ),
             ],
           ),
           const SizedBox(height: 5),
           Row(
             children: [
               Flexible(
-                flex: 2,
-                child: numericTextField(_unitPriceController, 'price'),
+                flex: 1,
+                child: numericTextField(
+                    _quantityController,
+                    quantityHintValue == 0
+                        ? 'Quantity'
+                        : quantityHintValue.toString(),
+                    'Quantity'),
               ),
               Flexible(
                 flex: 1,
-                child: dropdownField(),
+                child: numericTextField(
+                    _totalPriceCrontroller,
+                    priceHintValue == 0
+                        ? 'Total price'
+                        : 'unit price: $priceHintValue',
+                    'Total Price'),
               ),
+              // Flexible(
+              //   flex: 1,
+              //   child: dropdownField(),
+              // ),
             ],
           ),
           const SizedBox(height: 5),
-          SizedBox(
-            width: double.infinity,
-            height: 60,
-            child: ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate() &&
-                    (double.tryParse(_quantityController.text) ?? 0) > 0) {
-                  double unitPrice =
-                      (double.tryParse(_unitPriceController.text) ?? 0) /
-                          (double.tryParse(_quantityController.text) ?? 1);
-                  widget.fetchItemCubit.addItems(
-                    itemName: _selectedItem ?? _itemNameController.text,
-                    unitType: _selectedUnit ?? '',
-                    unitPrice: unitPrice,
-                    itemQuantity:
-                        double.tryParse(_quantityController.text) ?? 0,
-                  );
-                }
-              },
-              child: Text(
-                'Add',
-                style: Theme.of(context).textTheme.displayLarge,
-              ),
-            ),
-          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _delete(context),
+              _add(context),
+              _edit(context),
+            ],
+          )
         ],
+      ),
+    );
+  }
+
+  SizedBox _add(BuildContext context) {
+    return SizedBox(
+      width: 130,
+      height: 50,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        onPressed: () {
+          if (_formKey.currentState!.validate() &&
+              (double.tryParse(_quantityController.text) ?? 0) > 0) {
+            double totalPrice =
+                (double.tryParse(_totalPriceCrontroller.text) ?? 0);
+            double? itemQuantity = double.tryParse(_quantityController.text);
+            widget.fetchItemCubit.addItems(
+              itemName: _itemNameController.text,
+              unitType: 'kg',
+              unitPrice: totalPrice / (itemQuantity ?? 1),
+              itemQuantity: itemQuantity ?? 0,
+            );
+          }
+        },
+        child: Text(
+          'Add',
+          style: Theme.of(context).textTheme.displayLarge,
+        ),
+      ),
+    );
+  }
+
+  SizedBox _edit(BuildContext context) {
+    return SizedBox(
+      width: 100,
+      height: 45,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        onPressed: () {
+          if (_formKey.currentState!.validate() &&
+              (double.tryParse(_quantityController.text) ?? 0) > 0 &&
+              _selectedId != null) {
+            _showEditDialog(context);
+          } else {}
+        },
+        child: Text(
+          'Edit',
+          style: Theme.of(context).textTheme.displayLarge,
+        ),
+      ),
+    );
+  }
+
+  SizedBox _delete(BuildContext context) {
+    return SizedBox(
+      width: 100,
+      height: 45,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        onPressed: () {
+          _showAlertDialog(context);
+        },
+        child: Text(
+          'delete',
+          style: Theme.of(context).textTheme.displayLarge,
+        ),
       ),
     );
   }
@@ -104,6 +184,7 @@ class AddRecordViewState extends State<AddRecordView> {
   Widget numericTextField(
     TextEditingController controller,
     String hintText,
+    String label,
   ) {
     return TextFormField(
       controller: controller,
@@ -113,10 +194,10 @@ class AddRecordViewState extends State<AddRecordView> {
           borderRadius: BorderRadius.circular(10),
         ),
         hintText: hintText,
-        labelText: hintText,
+        labelText: label,
       ),
       keyboardType: TextInputType.number,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      // inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       validator: (value) =>
           value == null || value.isEmpty ? "Please enter value" : null,
     );
@@ -128,7 +209,7 @@ class AddRecordViewState extends State<AddRecordView> {
       child: DropdownButtonFormField<String>(
         value: _selectedUnit,
         decoration: const InputDecoration(labelText: "Unit Type"),
-        items: ['kg', 'piece']
+        items: ['kg', 'piece', 'other']
             .map((unit) => DropdownMenuItem(value: unit, child: Text(unit)))
             .toList(),
         onChanged: (value) {
@@ -156,10 +237,15 @@ class AddRecordViewState extends State<AddRecordView> {
       onSelected: (ItemEntity selection) {
         setState(() {
           _selectedItem = selection.itemName ?? '';
+          _selectedId = selection.id ?? '';
           _itemNameController.text = selection.itemName ?? '';
           _quantityController.text = selection.quantity.toString();
-          _unitPriceController.text = selection.unitPrice.toString();
+          _totalPriceCrontroller.text =
+              ((selection.unitPrice ?? 0) * (selection.quantity ?? 0))
+                  .toString();
           _selectedUnit = selection.unitType ?? '';
+          quantityHintValue = selection.quantity ?? 0;
+          priceHintValue = selection.unitPrice ?? 0;
         });
       },
       fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
@@ -182,6 +268,108 @@ class AddRecordViewState extends State<AddRecordView> {
         );
       },
       optionsViewOpenDirection: OptionsViewOpenDirection.up,
+    );
+  }
+
+  Future<dynamic> _showAlertDialog(
+    BuildContext context,
+  ) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete Item'),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Are you sure you want delete your data?'),
+              Text('Ensure Network is connected',
+                  style: TextStyle(color: Colors.red)),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                widget.fetchItemCubit
+                    .deleteItem(itemId: _selectedId ?? '', price: '');
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Item'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Are you sure you want edit your data?'),
+            Text(
+              'Ensure Network is connected',
+              style: TextStyle(color: Colors.red),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () {
+              double totalPrice =
+                  (double.tryParse(_totalPriceCrontroller.text) ?? 0);
+              double? itemQuantity = double.tryParse(_quantityController.text);
+              double unitPrice = totalPrice / (itemQuantity ?? 1);
+              Future(() async {
+                // await FetchItemDataSourceImpl().updateItem(
+                //   itemId: _selectedId ?? '',
+                //   unitPrice: unitPrice,
+                //   quantity: itemQuantity ?? 0,
+                // );
+                _selectedItem = _itemNameController.text;
+                String newId =
+                    '${_selectedItem}_${unitPrice.toStringAsFixed(2)}';
+                // widget.fetchItemCubit.deleteItem(itemId: _selectedId ?? '');
+                // widget.fetchItemCubit.addItems(
+                //   itemName: _selectedItem ?? 'no item name',
+                //   unitType: 'kg',
+                //   unitPrice: unitPrice,
+                //   itemQuantity: itemQuantity ?? 0,
+                // );
+                // widget.fetchItemCubit.fetchItems();
+                widget.fetchItemCubit.updateItem(
+                  itemId: newId,
+                  itemOldId: _selectedId ?? '',
+                  unitPrice: unitPrice,
+                  quantity: itemQuantity ?? 0,
+                  itemName: _selectedItem ?? 'no item name',
+                  unitType: 'kg',
+                );
+              });
+              Navigator.of(context).pop();
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
     );
   }
 }

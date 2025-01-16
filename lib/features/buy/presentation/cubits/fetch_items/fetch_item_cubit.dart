@@ -3,6 +3,7 @@ import 'package:diary/features/buy/domain/entities/add_request_entity.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/item_entity.dart';
+import '../../../domain/entities/update_request_entity.dart';
 import '../../../domain/use_cases/fetch_item_use_case.dart';
 
 part 'fetch_item_state.dart';
@@ -28,7 +29,9 @@ class FetchItemCubit extends Cubit<FetchItemState> {
     required double unitPrice,
     required double itemQuantity,
   }) async {
-    String id = "${itemName}_$unitPrice";
+    String id = "${itemName}_${unitPrice.toStringAsFixed(2)}";
+    // String id = itemName;
+
     AddRequestEntity entity = AddRequestEntity(
       id: id,
       itemName: itemName,
@@ -44,13 +47,36 @@ class FetchItemCubit extends Cubit<FetchItemState> {
     });
   }
 
-  void deleteItem({required String itemName, required String price})async{
-    String itemId = "${itemName}_$price";
+  void deleteItem({required String itemId, String? price}) async {
     final result = await fetchItemUseCase.delete(itemId: itemId);
-    result.fold((success){
+    result.fold((success) {
       emit(DeleteItemSuccess(success: success));
-    }, (error){
+    }, (error) {
       emit(DeleteItemError(error));
+    });
+  }
+
+  void updateItem({
+    required String itemId,
+    required String itemOldId,
+    required double unitPrice,
+    required double quantity,
+    required String itemName,
+    required String unitType,
+  }) async {
+    UpdateRequestEntity entity = UpdateRequestEntity(
+      itemId: itemId,
+      itemOldId: itemOldId,
+      unitPrice: unitPrice,
+      quantity: quantity,
+      itemName: itemName,
+      unitType: unitType,
+    );
+    final result = await fetchItemUseCase.update(entity: entity);
+    result.fold((items) {
+      emit(FetchItemSuccess(items: items));
+    }, (error) {
+      emit(FetchItemError(error));
     });
   }
 }

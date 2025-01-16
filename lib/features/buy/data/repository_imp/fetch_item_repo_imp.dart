@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:diary/features/buy/domain/entities/add_request_entity.dart';
 
 import '../../domain/entities/item_entity.dart';
+import '../../domain/entities/update_request_entity.dart';
 import '../../domain/repository/fetch_item_repo.dart';
 import '../data_source/data_source.dart';
 import '../models/item_model.dart';
@@ -15,7 +16,6 @@ class FetchItemRepoImp implements FetchItemRepo {
   Future<Either<List<ItemEntity>, String>> fetchItems() async {
     try {
       final response = await fetchItemDataSource.fetchItems();
-      print('hrr response ${response}');
       final res = response.map((json) {
         return ItemModel.fromJson(json).toEntity();
       }).toList();
@@ -40,10 +40,10 @@ class FetchItemRepoImp implements FetchItemRepo {
         double fetchedQuantity = fetchedEntity.quantity ?? 0;
         double newQuantity = inputQuantity + fetchedQuantity;
         double newUnitPrice = (inputUnitPrice * inputQuantity +
-            fetchedUnitPrice * fetchedQuantity) /
+                fetchedUnitPrice * fetchedQuantity) /
             newQuantity;
         entity.quantity = newQuantity;
-        entity.unitPrice = newUnitPrice;
+        entity.unitPrice = newUnitPrice.floorToDouble();
       }
       fetchItemDataSource.addItems(entity: entity);
       return const Left('Data added successfully');
@@ -56,12 +56,27 @@ class FetchItemRepoImp implements FetchItemRepo {
   Future<Either<String, String>> deleteItem({required String id}) async {
     try {
       if (await fetchItemDataSource.doesItemExist(itemId: id)) {
+        await fetchItemDataSource.deleteFromFirestore(itemId: id);
         await fetchItemDataSource.deleteItem(id: id);
         return const Left('Successfully deleted.');
       }
       return const Right("Item doesn't exists");
     } catch (e) {
       return Right(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<List<ItemEntity>, String>> updateItem(
+      {required UpdateRequestEntity entity}) async {
+    try {
+      final response = await fetchItemDataSource.updateItemNew(entity: entity);
+      final res = response.map((json) {
+        return ItemModel.fromJson(json).toEntity();
+      }).toList();
+      return Left(res);
+    } catch (e) {
+      return Right('Failed to update item: ${e.toString()}');
     }
   }
 }
