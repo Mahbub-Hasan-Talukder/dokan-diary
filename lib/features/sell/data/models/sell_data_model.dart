@@ -3,6 +3,7 @@ import 'package:diary/features/sell/domain/entities/sell_data_entity.dart';
 class SellDataModel {
   String? itemName;
   String? itemId;
+  int? saleId;
   String? sellDate;
   double? quantitySold;
   double? totalPrice;
@@ -15,6 +16,7 @@ class SellDataModel {
     this.quantitySold,
     this.totalPrice,
     this.unitPrice,
+    this.saleId,
   });
 
   SellDataModel.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,7 @@ class SellDataModel {
     quantitySold = json['quantity_sold'];
     totalPrice = json['total_price'];
     unitPrice = json['item_unit_price'];
+    saleId = json['sale_id'];
   }
 
   SellDataEntity toEntity() {
@@ -35,6 +38,7 @@ class SellDataModel {
       quantitySold: quantitySold,
       totalPrice: totalPrice,
       profit: profit,
+      saleId: saleId,
     );
   }
 }

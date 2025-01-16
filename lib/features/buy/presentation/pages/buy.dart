@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,16 +15,21 @@ class Buy extends StatefulWidget {
 
 class _BuyState extends State<Buy> {
   final FetchItemCubit _fetchItemCubit = getIt.get<FetchItemCubit>();
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     _fetchItemCubit.fetchItems();
+    _scrollController = ScrollController();
     super.initState();
   }
 
   @override
   void dispose() {
-    _fetchItemCubit;
+    if (!mounted) {
+      _fetchItemCubit.close();
+    }
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -40,7 +46,11 @@ class _BuyState extends State<Buy> {
               if (state is FetchItemSuccess) {
                 return Column(
                   children: [
-                    Expanded(child: buildListView(state)),
+                    Center(child: Text("Total items: ${state.items.length}")),
+                    const Divider(color: Colors.grey),
+                    Expanded(
+                      child: buildListView(state),
+                    ),
                     AddRecordView(
                       items: state.items,
                       fetchItemCubit: _fetchItemCubit,
@@ -76,44 +86,55 @@ class _BuyState extends State<Buy> {
 
   Widget buildListView(FetchItemSuccess state) {
     final items = state.items.reversed.toList();
-    if(items.isEmpty){
-      return Text('no data');
+    if (items.isEmpty) {
+      return const Text('No data');
     }
-    return ListView.separated(
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
-        return ListTile(
-          tileColor: Colors.grey.shade300,
-          leading: const Icon(Icons.hardware),
-          title: Text(item.itemName ?? 'N/A'),
-          subtitle: Text('Price: ${item.unitPrice?.toStringAsFixed(2)} tk'),
-          trailing: Text(
-            '${item.quantity}\n${item.unitType}',
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
-          onLongPress: () {
-            Scaffold.of(context).showBottomSheet(
-              (context) {
-                return modalSheetView(
-                  context,
-                  item.itemName ?? 'N/A',
-                  item.unitPrice.toString(),
-                );
-              },
-            );
-          },
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) {
-        return const SizedBox(height: 5);
-      },
+
+    items.sort((a, b) => a.itemName!.compareTo(b.itemName ?? ''));
+
+    return RawScrollbar(
+      controller: _scrollController,
+      thickness: 10,
+      thumbColor: Colors.grey.shade700,
+      thumbVisibility: true,
+      interactive: true,
+      child: ListView.separated(
+        controller: _scrollController,
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return ListTile(
+            tileColor: Colors.grey.shade300,
+            leading: const Icon(Icons.hardware),
+            title: Text(item.itemName ?? 'N/A'),
+            subtitle: Text('Unit P: ${item.unitPrice?.toStringAsFixed(2)} tk'),
+            trailing: Text(
+              '${item.quantity?.toStringAsFixed(2)}\n units',
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            onLongPress: () {
+              Scaffold.of(context).showBottomSheet(
+                (context) {
+                  return modalSheetView(
+                    context,
+                    item.id ?? 'N/A',
+                    item.unitPrice.toString(),
+                  );
+                },
+              );
+            },
+          );
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          return const SizedBox(height: 5);
+        },
+      ),
     );
   }
 
   Container modalSheetView(
     BuildContext context,
-    String itemName,
+    String itemId,
     String price,
   ) {
     return Container(
@@ -134,7 +155,7 @@ class _BuyState extends State<Buy> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  _fetchItemCubit.deleteItem(itemName: itemName, price: price);
+                  _fetchItemCubit.deleteItem(itemId: itemId, price: price);
                   Navigator.of(context).pop();
                 },
                 child: const Text(

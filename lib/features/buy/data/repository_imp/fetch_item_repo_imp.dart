@@ -39,7 +39,7 @@ class FetchItemRepoImp implements FetchItemRepo {
         double fetchedQuantity = fetchedEntity.quantity ?? 0;
         double newQuantity = inputQuantity + fetchedQuantity;
         double newUnitPrice = (inputUnitPrice * inputQuantity +
-            fetchedUnitPrice * fetchedQuantity) /
+                fetchedUnitPrice * fetchedQuantity) /
             newQuantity;
         entity.quantity = newQuantity;
         entity.unitPrice = newUnitPrice.floorToDouble();
@@ -55,6 +55,7 @@ class FetchItemRepoImp implements FetchItemRepo {
   Future<Either<String, String>> deleteItem({required String id}) async {
     try {
       if (await fetchItemDataSource.doesItemExist(itemId: id)) {
+        await fetchItemDataSource.deleteFromFirestore(itemId: id);
         await fetchItemDataSource.deleteItem(id: id);
         return const Left('Successfully deleted.');
       }

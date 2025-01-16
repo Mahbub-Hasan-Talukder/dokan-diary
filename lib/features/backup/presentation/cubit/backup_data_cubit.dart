@@ -21,11 +21,21 @@ class BackupDataCubit extends Cubit<BackupDataState> {
 
   void restoreData() async {
     emit(RestoreDataLoading());
-    final result = await backUpUseCase.uploadDataUseCase();
+    final result = await backUpUseCase.restoreDataUseCase();
     result.fold((successMsg) {
       emit(RestoreDataSuccess(successMsg));
     }, (error) {
       emit(RestoreDataFailed(error));
     });
   }
+
+  // void saveToDevice() async {
+  //   emit(SaveToDeviceLoading());
+  //   final result = await backUpUseCase.saveToDeviceUseCase();
+  //   result.fold((successMsg) {
+  //     emit(SaveToDeviceSuccess(successMsg));
+  //   }, (error) {
+  //     emit(SaveToDeviceFailed(error));
+  //   });
+  // }
 }

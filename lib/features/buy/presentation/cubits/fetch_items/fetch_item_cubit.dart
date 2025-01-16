@@ -28,7 +28,9 @@ class FetchItemCubit extends Cubit<FetchItemState> {
     required double unitPrice,
     required double itemQuantity,
   }) async {
-    String id = "${itemName}_${unitPrice.floorToDouble()}";
+    String id = "${itemName}_${unitPrice.toStringAsFixed(2)}";
+    // String id = itemName;
+
     AddRequestEntity entity = AddRequestEntity(
       id: id,
       itemName: itemName,
@@ -44,12 +46,11 @@ class FetchItemCubit extends Cubit<FetchItemState> {
     });
   }
 
-  void deleteItem({required String itemName, required String price})async{
-    String itemId = "${itemName}_$price";
+  void deleteItem({required String itemId, String? price}) async {
     final result = await fetchItemUseCase.delete(itemId: itemId);
-    result.fold((success){
+    result.fold((success) {
       emit(DeleteItemSuccess(success: success));
-    }, (error){
+    }, (error) {
       emit(DeleteItemError(error));
     });
   }

@@ -37,6 +37,7 @@ class AddRecordViewState extends State<AddSellView> {
   final FetchBoughtItemsCubit _fetchBoughtItemsCubit =
       getIt.get<FetchBoughtItemsCubit>();
   String _selectedId = '';
+  double dynamicQuantity = 0;
 
   @override
   void initState() {
@@ -97,14 +98,19 @@ class AddRecordViewState extends State<AddSellView> {
           const SizedBox(height: 5),
           Row(
             children: [
-              Flexible(
-                flex: 2,
-                child: numericTextField(_priceController, 'price'),
-              ),
               const SizedBox(height: 10),
               Flexible(
                 flex: 1,
-                child: numericTextField(_quantityController, 'quantity'),
+                child: numericTextField(
+                  _quantityController,
+                  (dynamicQuantity == 0)
+                      ? 'quantity'
+                      : dynamicQuantity.toString(),
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: numericTextField(_priceController, 'price'),
               ),
             ],
           ),
@@ -113,6 +119,13 @@ class AddRecordViewState extends State<AddSellView> {
             width: double.infinity,
             height: 60,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
               onPressed: () {
                 handleOnPressed();
               },
@@ -131,24 +144,24 @@ class AddRecordViewState extends State<AddSellView> {
     bool isValid = _formKey.currentState!.validate();
     double quantity = double.tryParse(_quantityController.text) ?? 0;
     double price = double.tryParse(_priceController.text) ?? 0;
-    double remainingQuantity = 0;
+    double existingQuantity = 0;
     for (FetchItemEntity item in entityList) {
       if (item.itemId == _selectedId) {
-        remainingQuantity = item.quantity ?? 0;
+        existingQuantity = item.quantity ?? 0;
       }
     }
     if (isValid &&
-        quantity > 0 &&
+        quantity <= existingQuantity &&
         price > 0 &&
-        remainingQuantity >= quantity &&
+        existingQuantity > 0 &&
         _selectedId.isNotEmpty) {
-      double unitPrice = price / quantity;
       widget.sellDataCubit.addSellData(
         reqEntity: SellRequestEntity(
           itemId: _selectedId,
           soldQuantity: quantity,
           soldPrice: price,
           date: DateTimeFormat.getYMD(widget.dateTime.value),
+          remainingQuantity: existingQuantity - quantity,
         ),
       );
     }
@@ -158,6 +171,7 @@ class AddRecordViewState extends State<AddSellView> {
     TextEditingController controller,
     String hintText,
   ) {
+    controller.text = '';
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
@@ -169,7 +183,7 @@ class AddRecordViewState extends State<AddSellView> {
         labelText: hintText,
       ),
       keyboardType: TextInputType.number,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      // inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       validator: (value) =>
           value == null || value.isEmpty ? "Please enter value" : null,
     );
@@ -187,9 +201,12 @@ class AddRecordViewState extends State<AddSellView> {
       },
       displayStringForOption: (FetchItemEntity option) => option.itemId ?? '',
       onSelected: (FetchItemEntity selection) {
-        _itemNameController.text = selection.itemId ?? '';
-        _quantityController.text = selection.quantity.toString();
-        _selectedId = selection.itemId ?? '';
+        setState(() {
+          _itemNameController.text = selection.itemId ?? '';
+          _quantityController.text = selection.quantity.toString();
+          dynamicQuantity = selection.quantity ?? 0;
+          _selectedId = selection.itemId ?? '';
+        });
       },
       fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
         _itemNameController.addListener(() {

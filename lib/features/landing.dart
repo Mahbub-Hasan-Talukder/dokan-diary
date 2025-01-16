@@ -1,9 +1,15 @@
+import 'package:diary/features/backup/presentation/widgets/delete_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
 
+import 'add_note/presentation/page/notes_list_page.dart';
+import 'backup/presentation/widgets/restore_widget.dart';
+import 'backup/presentation/widgets/upload_widget.dart';
 import 'sell/presentation/pages/sell.dart';
-import 'records.dart';
+import 'records/presentation/pages/records.dart';
 import 'buy/presentation/pages/buy.dart';
+import 'dashboard/presentation/pages/dashboard.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,52 +21,160 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final bs = BehaviorSubject<int>.seeded(0);
 
+  Future<bool?> _showBackDialog() {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Are you sure?'),
+          content: const Text(
+            'Are you sure to exit?',
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Exit'),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Diary'),
-        centerTitle: true,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) {
+          return;
+        }
+        final bool shouldPop = await _showBackDialog() ?? false;
+        if (context.mounted && shouldPop) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Diary'),
+          centerTitle: true,
+        ),
+        drawer: buildDrawer(context),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: StreamBuilder<int>(
+                  stream: bs,
+                  builder: (context, snapshot) {
+                    if (snapshot.data == 0) {
+                      return const Buy();
+                    } else if (snapshot.data == 1) {
+                      return const Sell();
+                    } else if (snapshot.data == 2) {
+                      return const Records();
+                    } else if (snapshot.data == 3) {
+                      return const Dashboard();
+                    }
+                    return const Records();
+                  },
+                ),
+              ),
+              Container(
+                //work as bottom nav bar
+                color: Colors.grey.shade100,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    navButton(
+                      text: 'Buy',
+                      icon: Icons.money_off,
+                      index: 0,
+                    ),
+                    navButton(
+                      text: 'Sell',
+                      icon: Icons.money_rounded,
+                      index: 1,
+                    ),
+                    navButton(
+                      text: 'Records',
+                      icon: Icons.list_rounded,
+                      index: 2,
+                    ),
+                    navButton(
+                      text: 'Dashboard',
+                      icon: Icons.dashboard_rounded,
+                      index: 3,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      body: SafeArea(
-        child: Column(
+    );
+  }
+
+  Drawer buildDrawer(BuildContext context) {
+    return Drawer(
+      child: Column(
+        children: [
+          const SizedBox(height: 50),
+          _notes(context),
+          const Expanded(child: SizedBox()),
+          const UploadWidget(),
+          const RestoreWidget(),
+          const DeleteWidget(),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  GestureDetector _notes(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const NotesListPage(),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              child: StreamBuilder<int>(
-                stream: bs,
-                builder: (context, snapshot) {
-                  if (snapshot.data == 0) {
-                    return const Buy();
-                  } else if (snapshot.data == 1) {
-                    return const Sell();
-                  }
-                  return const Records();
-                },
-              ),
-            ),
-            Container(
-              color: Colors.grey.shade100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  navButton(
-                    text: 'Buy',
-                    icon: Icons.money_off,
-                    index: 0,
-                  ),
-                  navButton(
-                    text: 'Sell',
-                    icon: Icons.money_rounded,
-                    index: 1,
-                  ),
-                  navButton(
-                    text: 'Records',
-                    icon: Icons.list_rounded,
-                    index: 2,
-                  ),
-                ],
-              ),
+            Icon(Icons.note_add_rounded,
+                color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 10),
+            Text(
+              'Notes',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
             ),
           ],
         ),
@@ -77,7 +191,9 @@ class _HomePageState extends State<HomePage> {
     return StreamBuilder(
       stream: bs,
       builder: (context, snapshot) {
-        color = (snapshot.data == index) ? Theme.of(context).colorScheme.primary : Colors.grey;
+        color = (snapshot.data == index)
+            ? Theme.of(context).colorScheme.primary
+            : Colors.grey;
         return TextButton(
           onPressed: () {
             bs.add(index);

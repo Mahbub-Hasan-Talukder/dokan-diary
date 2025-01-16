@@ -5,6 +5,7 @@ class SellDataEntity {
   double? quantitySold;
   double? totalPrice;
   double? profit;
+  int? saleId;
 
   SellDataEntity({
     this.itemName,
@@ -13,5 +14,6 @@ class SellDataEntity {
     this.quantitySold,
     this.totalPrice,
     this.profit,
+    this.saleId,
   });
 }

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:diary/features/buy/domain/entities/add_request_entity.dart';
 import 'package:sqflite/sqflite.dart';
@@ -49,9 +50,9 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
   }
 
   @override
-  Future<bool>doesItemExist({required String itemId})async {
+  Future<bool> doesItemExist({required String itemId}) async {
     _db ??= await dbHelper.database;
-    if(_db!=null){
+    if (_db != null) {
       final result = await _db!.query(
         'Items',
         where: 'item_id = ?',
@@ -63,9 +64,9 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
   }
 
   @override
-  Future<List<Map<String, Object?>>> getItem({required String itemId}) async{
+  Future<List<Map<String, Object?>>> getItem({required String itemId}) async {
     _db ??= await dbHelper.database;
-    if(_db!=null){
+    if (_db != null) {
       final result = await _db!.query(
         'Items',
         where: 'item_id = ?',
@@ -76,5 +77,59 @@ class FetchItemDataSourceImpl implements FetchItemDataSource {
     throw Exception('Database instance not created');
   }
 
+  Future<void> updateItem({
+    required String itemId,
+    required double unitPrice,
+    required double quantity,
+  }) async {
+    try {
+      await updateToFirestore(
+        itemId: itemId,
+        unitPrice: unitPrice,
+        quantity: quantity,
+      );
 
+      _db ??= await dbHelper.database;
+
+      // Execute the update query
+      await _db!.rawUpdate(
+        '''
+    UPDATE Items
+    SET 
+      item_unit_price = ?, 
+      item_quantity = ?
+    WHERE 
+      item_id = ?;
+    ''',
+        [unitPrice, quantity, itemId], // Bind the values here
+      );
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<void> deleteFromFirestore({required String itemId}) async {
+    try {
+      await FirebaseFirestore.instance.collection('Items').doc(itemId).delete();
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<void> updateToFirestore({
+    required String itemId,
+    required double unitPrice,
+    required double quantity,
+  }) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('Items')
+          .doc(itemId)
+          .update({'item_unit_price': unitPrice, 'item_quantity': quantity});
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
 }
