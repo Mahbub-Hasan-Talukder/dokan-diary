@@ -239,10 +239,11 @@ class AddRecordViewState extends State<AddRecordView> {
           _selectedItem = selection.itemName ?? '';
           _selectedId = selection.id ?? '';
           _itemNameController.text = selection.itemName ?? '';
-          _quantityController.text = selection.quantity.toString();
+          _quantityController.text =
+              selection.quantity?.toStringAsFixed(2) ?? '0';
           _totalPriceCrontroller.text =
               ((selection.unitPrice ?? 0) * (selection.quantity ?? 0))
-                  .toString();
+                  .toStringAsFixed(2);
           _selectedUnit = selection.unitType ?? '';
           quantityHintValue = selection.quantity ?? 0;
           priceHintValue = selection.unitPrice ?? 0;

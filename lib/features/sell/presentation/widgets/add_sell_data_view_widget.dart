@@ -105,7 +105,7 @@ class AddRecordViewState extends State<AddSellView> {
                   _quantityController,
                   (dynamicQuantity == 0)
                       ? 'quantity'
-                      : dynamicQuantity.toString(),
+                      : dynamicQuantity.toStringAsFixed(2),
                 ),
               ),
               Flexible(
@@ -203,7 +203,8 @@ class AddRecordViewState extends State<AddSellView> {
       onSelected: (FetchItemEntity selection) {
         setState(() {
           _itemNameController.text = selection.itemId ?? '';
-          _quantityController.text = selection.quantity.toString();
+          _quantityController.text =
+              selection.quantity?.toStringAsFixed(2) ?? '0';
           dynamicQuantity = selection.quantity ?? 0;
           _selectedId = selection.itemId ?? '';
         });
