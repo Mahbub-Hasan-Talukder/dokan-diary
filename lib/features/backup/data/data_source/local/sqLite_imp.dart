@@ -56,31 +56,61 @@ class SqLiteImp implements BackupLocalDataSource {
 
   @override
   Future<void> restoreSalesTable(
-    QuerySnapshot<Map<String, dynamic>> snapshots,
+    QuerySnapshot<Map<String, dynamic>> salesSnapshots,
+    QuerySnapshot<Map<String, dynamic>> itemsSnapshots,
   ) async {
     try {
       _db ??= await dbHelper.database;
-
       if (_db == null) return;
-      for (var snapshot in snapshots.docs) {
+
+      // Create a map to quickly find item details using item_id
+      Map<String, Map<String, dynamic>> itemsMap = {};
+
+      for (var item in itemsSnapshots.docs) {
+        final itemData = item.data();
+        final String itemId = itemData['item_id']?.toString() ?? "0";
+        final String itemName = itemData['item_name'] ?? 'Unknown';
+        final double unitPrice =
+            double.tryParse(itemData['item_unit_price'].toString()) ?? 0.0;
+
+        itemsMap[itemId] = {
+          'item_name': itemName,
+          'unit_price': unitPrice,
+        };
+      }
+
+      for (var snapshot in salesSnapshots.docs) {
         final data = snapshot.data();
-        // Extract values from the snapshot
-        final itemId = data['item_id'] ?? 0;
-        final quantitySold = data['quantity_sold'] ?? '';
-        final saleDate = data['sale_date'] ?? '';
-        final saleId = data['sale_id'] ?? 0.0;
-        final totalPrice = data['total_price'] ?? 0.0;
+        final String itemId = data['item_id']?.toString() ?? "0";
+        final double quantitySold =
+            double.tryParse(data['quantity_sold'].toString()) ?? 0;
+        final String saleDate = data['sale_date'] ?? '';
+        final int saleId = int.tryParse(data['sale_id'].toString()) ?? 0;
+        final double totalPrice =
+            double.tryParse(data['total_price'].toString()) ?? 0.0;
+
+        // Retrieve item details
+        final String itemName =
+            itemsMap[itemId]?['item_name'] ?? _getItemName(itemId) ?? 'Unknown';
+        final double unitPrice = (itemsMap[itemId]?['unit_price'] ??
+            _getItemUnitPrice(itemId) ??
+            0.0) as double;
+
+        // Calculate total_purchase
+        final double totalPurchase = quantitySold * unitPrice;
 
         // Insert or replace the data
         await _db!.rawInsert('''
-        INSERT OR REPLACE INTO Sales (sale_id, item_id, sale_date, quantity_sold, total_price)
-        VALUES (?, ?, ?, ?, ?)
-    ''', [
+        INSERT OR REPLACE INTO Sales (sale_id, item_id, item_name, sale_date, quantity_sold, total_price, total_purchase)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      ''', [
           saleId,
           itemId,
+          itemName,
           saleDate,
           quantitySold,
           totalPrice,
+          totalPurchase,
         ]);
       }
     } catch (e) {
@@ -128,5 +158,13 @@ class SqLiteImp implements BackupLocalDataSource {
     } catch (e) {
       throw Exception(e.toString());
     }
+  }
+
+  _getItemName(String itemId) {
+    return itemId.split('_').first;
+  }
+
+  _getItemUnitPrice(String itemId) {
+    return double.tryParse(itemId.split('_').last) ?? 0.0;
   }
 }

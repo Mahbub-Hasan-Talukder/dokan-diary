@@ -42,15 +42,16 @@ class DatabaseHelper {
 
     // Create Sales table
     await db.execute('''
-      CREATE TABLE Sales (
-        sale_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        item_id TEXT NOT NULL,
-        sale_date TEXT NOT NULL,
-        quantity_sold REAL NOT NULL,
-        total_price REAL NOT NULL,
-        FOREIGN KEY (item_id) REFERENCES Items (item_id) ON DELETE CASCADE
-      )
-    ''');
+  CREATE TABLE Sales (
+    sale_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    item_id TEXT NOT NULL,
+    item_name TEXT NOT NULL,
+    sale_date TEXT NOT NULL,
+    quantity_sold REAL NOT NULL,
+    total_price REAL NOT NULL,
+    total_purchase REAL NOT NULL
+  )
+''');
 
     // Add the Notes table
     await db.execute('''

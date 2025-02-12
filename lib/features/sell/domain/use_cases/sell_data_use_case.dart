@@ -24,15 +24,17 @@ class SellDataUseCase {
     return await sellDataRepo.fetchItems();
   }
 
-  Future<Either<String, String>> undoSell({
+  Future<Either<List<SellDataEntity>, String>> undoSell({
     required int saleId,
     required double quantitySold,
     required String itemId,
+    required DateTime date,
   }) async {
     return await sellDataRepo.undoSell(
       saleId: saleId,
       quantitySold: quantitySold,
       itemId: itemId,
+      date: date,
     );
   }
 }

@@ -23,6 +23,7 @@ class _SellState extends State<Sell> {
   final UndoRecordCubit _undoRecordCubit = getIt.get<UndoRecordCubit>();
   final BehaviorSubject<DateTime> dateStream =
       BehaviorSubject.seeded(DateTime.now());
+  List<SellDataEntity> items = [];
   final List<IconData> _icons = [
     Icons.hardware_outlined,
     Icons.pin_invoke_outlined,
@@ -64,16 +65,17 @@ class _SellState extends State<Sell> {
             bloc: _sellDataCubit,
             builder: (context, state) {
               if (state is SellDataSuccess) {
+                items = state.items;
                 return Column(
                   children: [
                     Text(
                       DateTimeFormat.getPrettyDate(dateStream.value),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    summaryView(state.items, context),
-                    Expanded(child: listView(state.items)),
+                    summaryView(context),
+                    Expanded(child: listView()),
                     AddSellView(
-                      items: state.items,
+                      items: items,
                       sellDataCubit: _sellDataCubit,
                       dateTime: dateStream,
                     ),
@@ -108,7 +110,7 @@ class _SellState extends State<Sell> {
     );
   }
 
-  Widget listView(List<SellDataEntity> items) {
+  Widget listView() {
     if (items.isEmpty) {
       return const Center(child: Text('No data found'));
     }
@@ -209,7 +211,7 @@ class _SellState extends State<Sell> {
     );
   }
 
-  Widget summaryView(List<SellDataEntity> items, BuildContext context) {
+  Widget summaryView(BuildContext context) {
     double totalProfit = 0;
     double totalSell = 0;
     for (SellDataEntity entity in items) {
@@ -281,6 +283,9 @@ class _SellState extends State<Sell> {
                     });
                   }
                   if (state is UndoRecordSuccess) {
+                    setState(() {
+                      items = state.items;
+                    });
                     _sellDataCubit.fetchSellData(date: dateStream.value);
                   }
                   return ElevatedButton(
@@ -289,6 +294,7 @@ class _SellState extends State<Sell> {
                         saleId: saleId,
                         itemId: itemId,
                         quantitySold: quantitySold,
+                        date: dateStream.value,
                       );
                       Navigator.of(context).pop();
                     },

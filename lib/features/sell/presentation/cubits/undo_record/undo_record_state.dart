@@ -15,12 +15,12 @@ final class UndoRecordLoading extends UndoRecordState {
 }
 
 final class UndoRecordSuccess extends UndoRecordState {
-  final String message;
+  final List<SellDataEntity> items;
 
-  const UndoRecordSuccess(this.message);
+  const UndoRecordSuccess(this.items);
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [items];
 }
 
 final class UndoRecordError extends UndoRecordState {

@@ -6,6 +6,8 @@ import '../../../../core/database/database_helper.dart';
 import '../../../../core/di/di.dart';
 import 'data_source.dart';
 
+// await _db!.rawDelete('DELETE FROM Sales;');
+// await _db!.rawDelete('DELETE FROM Items;');
 class SellDataSourceImp implements SellDataSource {
   final dbHelper = getIt<DatabaseHelper>();
   Database? _db;
@@ -14,19 +16,15 @@ class SellDataSourceImp implements SellDataSource {
   Future<List<Map<String, dynamic>>> fetchSellData(
       {required String saleDate}) async {
     _db ??= await dbHelper.database;
-    if (_db != null) {
-      // await _db!.rawDelete('DELETE FROM Sales;');
-      // await _db!.rawDelete('DELETE FROM Items;');
-      final result = await _db!.rawQuery('''
-        SELECT *
-        FROM Sales s JOIN Items i 
-        ON s.item_id = i.item_id
-        WHERE s.sale_date = ?;
-      ''', [saleDate]);
-
-      return result;
+    if (_db == null) {
+      throw Exception('Database instance not created');
     }
-    throw Exception('Database instance not created');
+
+    final result = await _db!.rawQuery('''
+    SELECT * FROM Sales WHERE sale_date = ?;
+  ''', [saleDate]);
+
+    return result;
   }
 
   @override
@@ -34,13 +32,15 @@ class SellDataSourceImp implements SellDataSource {
     _db ??= await dbHelper.database;
     if (_db != null) {
       await _db!.rawQuery('''
-        INSERT OR REPLACE INTO Sales (item_id, sale_date, quantity_sold, total_price)
-        VALUES (?, ?, ?, ?)
-      ''', [
+      INSERT OR REPLACE INTO Sales (item_id, item_name, sale_date, quantity_sold, total_price, total_purchase)
+      VALUES (?, ?, ?, ?, ?, ?)
+    ''', [
         entity.itemId ?? 'n/a',
+        entity.itemName ?? 'Unknown', // Store item name directly
         entity.date,
         entity.soldQuantity ?? 0,
-        entity.soldPrice ?? 0
+        entity.soldPrice ?? 0,
+        entity.totalPurchase ?? 0 // Store purchase price directly
       ]);
       return 'Information added successfully';
     }

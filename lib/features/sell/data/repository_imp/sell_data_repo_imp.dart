@@ -3,6 +3,7 @@ import 'package:diary/features/sell/data/models/FetchItemResponse.dart';
 import 'package:diary/features/sell/domain/entities/fetch_item_entity.dart';
 import 'package:diary/features/sell/domain/entities/sell_request_entity.dart';
 
+import '../../../../core/services/date_time_format.dart';
 import '../models/sell_data_model.dart';
 import '../../domain/entities/sell_data_entity.dart';
 import '../../domain/repository/fetch_sell_data_repo.dart';
@@ -53,10 +54,11 @@ class SellDataRepoImp implements SellDataRepo {
   }
 
   @override
-  Future<Either<String, String>> undoSell({
+  Future<Either<List<SellDataEntity>, String>> undoSell({
     required int saleId,
     required double quantitySold,
     required String itemId,
+    required DateTime date,
   }) async {
     try {
       final items = await sellDataSource.fetchItems();
@@ -69,6 +71,7 @@ class SellDataRepoImp implements SellDataRepo {
       }
       await sellDataSource.deleteSellFromFirestore(saleId.toString());
       if (entity != null) {
+        print('dbg in undo: $itemId, ${entity.quantity} $quantitySold');
         await sellDataSource.updateItemQuantity(
           itemId,
           entity.quantity! + quantitySold,
@@ -76,7 +79,17 @@ class SellDataRepoImp implements SellDataRepo {
         );
       }
       await sellDataSource.deleteItem(id: saleId);
-      return const Left('Successfully returned');
+      // if(entity != null){
+      //   await sellDataSource.updateItemQuantity(itemId, entity.quantity! + quantitySold,
+      //     'Items');
+      // }
+      final sellData = await sellDataSource.fetchSellData(
+        saleDate: DateTimeFormat.getYMD(date),
+      );
+
+      return Left(sellData.map((json) {
+        return SellDataModel.fromJson(json).toEntity();
+      }).toList());
     } catch (e) {
       return Right(e.toString());
     }

@@ -17,11 +17,12 @@ class BackupRepoImp implements BackupRepository {
   Future<Either<String, String>> restoreData() async {
     try {
       final localDataSource = getIt.get<BackupLocalDataSource>();
+
       final itemsTableData = await backupDataSource.restore('Items');
       await localDataSource.restoreItemsTable(itemsTableData);
 
       final salesTableData = await backupDataSource.restore('Sales');
-      await localDataSource.restoreSalesTable(salesTableData);
+      await localDataSource.restoreSalesTable(salesTableData, itemsTableData);
 
       return Left('Success');
     } catch (e) {

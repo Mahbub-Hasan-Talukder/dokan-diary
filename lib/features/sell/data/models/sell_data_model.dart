@@ -7,7 +7,7 @@ class SellDataModel {
   String? sellDate;
   double? quantitySold;
   double? totalPrice;
-  double? unitPrice;
+  double? totalPurchase;
 
   SellDataModel({
     this.itemName,
@@ -15,7 +15,7 @@ class SellDataModel {
     this.sellDate,
     this.quantitySold,
     this.totalPrice,
-    this.unitPrice,
+    this.totalPurchase,
     this.saleId,
   });
 
@@ -25,12 +25,12 @@ class SellDataModel {
     sellDate = json['sale_date'];
     quantitySold = json['quantity_sold'];
     totalPrice = json['total_price'];
-    unitPrice = json['item_unit_price'];
+    totalPurchase = json['total_purchase'];
     saleId = json['sale_id'];
   }
 
   SellDataEntity toEntity() {
-    double profit = (totalPrice ?? 0) - (quantitySold ?? 0) * (unitPrice ?? 0);
+    double profit = (totalPrice ?? 0) - (totalPurchase ?? 0);
     return SellDataEntity(
       itemName: itemName,
       itemId: itemId,

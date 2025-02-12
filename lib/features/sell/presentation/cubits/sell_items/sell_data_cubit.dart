@@ -17,8 +17,8 @@ class SellDataCubit extends Cubit<SellDataState> {
 
   void fetchSellData({required DateTime date}) async {
     emit(SellDataLoading());
-    String id = DateTimeFormat.getYMD(date);
-    final result = await sellDataUseCase.fetchSellData(date: id);
+    String dateString = DateTimeFormat.getYMD(date);
+    final result = await sellDataUseCase.fetchSellData(date: dateString);
     result.fold((items) {
       emit(SellDataSuccess(items: items));
     }, (error) {
@@ -36,6 +36,4 @@ class SellDataCubit extends Cubit<SellDataState> {
       emit(AddSellDataError(error));
     });
   }
-
-
 }

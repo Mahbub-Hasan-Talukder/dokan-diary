@@ -38,6 +38,8 @@ class AddRecordViewState extends State<AddSellView> {
       getIt.get<FetchBoughtItemsCubit>();
   String _selectedId = '';
   double dynamicQuantity = 0;
+  String? _itemName;
+  double _unitPrice = 0;
 
   @override
   void initState() {
@@ -140,6 +142,16 @@ class AddRecordViewState extends State<AddSellView> {
     );
   }
 
+  /*
+   sale_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    item_id TEXT NOT NULL,
+    item_name TEXT NOT NULL,
+        sale_date TEXT NOT NULL,
+        quantity_sold REAL NOT NULL,
+        total_price REAL NOT NULL,
+    total_purchase REAL NOT NULL,
+  */
+
   void handleOnPressed() {
     bool isValid = _formKey.currentState!.validate();
     double quantity = double.tryParse(_quantityController.text) ?? 0;
@@ -158,10 +170,12 @@ class AddRecordViewState extends State<AddSellView> {
       widget.sellDataCubit.addSellData(
         reqEntity: SellRequestEntity(
           itemId: _selectedId,
+          itemName: _itemName,
           soldQuantity: quantity,
           soldPrice: price,
           date: DateTimeFormat.getYMD(widget.dateTime.value),
           remainingQuantity: existingQuantity - quantity,
+          totalPurchase: _unitPrice * quantity,
         ),
       );
     }
@@ -207,6 +221,8 @@ class AddRecordViewState extends State<AddSellView> {
               selection.quantity?.toStringAsFixed(2) ?? '0';
           dynamicQuantity = selection.quantity ?? 0;
           _selectedId = selection.itemId ?? '';
+          _itemName = selection.itemName;
+          _unitPrice = selection.unitPrice ?? 0;
         });
       },
       fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {

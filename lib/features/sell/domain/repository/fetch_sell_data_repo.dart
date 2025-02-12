@@ -12,9 +12,10 @@ abstract class SellDataRepo {
 
   Future<Either<List<FetchItemEntity>, String>> fetchItems();
 
-  Future<Either<String, String>> undoSell({
+  Future<Either<List<SellDataEntity>, String>> undoSell({
     required int saleId,
     required double quantitySold,
     required String itemId,
+    required DateTime date,
   });
 }
