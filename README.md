@@ -27,9 +27,9 @@ Shop Diary is a user-friendly, feature-rich app designed to simplify the trackin
 
 ## 📱 Screenshots
 
-![Screenshot 1](https://drive.google.com/file/d/1djVv6rlo6SjQH_vlZHRe8wjzMDJSNqpm/view?usp=drive_link)
-![Screenshot 2](https://drive.google.com/file/d/1QX_lvauDgaVhxNIBiPJD0BqXv4tzvWP7/view?usp=drive_link)
-![Screenshot 3](https://drive.google.com/file/d/1WvYHcoJ2U9xvyKVNmcQ_76cSrdW5Ed6o/view?usp=drive_link)
+[Screenshot 1](https://drive.google.com/file/d/1djVv6rlo6SjQH_vlZHRe8wjzMDJSNqpm/view?usp=drive_link)
+[Screenshot 2](https://drive.google.com/file/d/1QX_lvauDgaVhxNIBiPJD0BqXv4tzvWP7/view?usp=drive_link)
+[Screenshot 3](https://drive.google.com/file/d/1WvYHcoJ2U9xvyKVNmcQ_76cSrdW5Ed6o/view?usp=drive_link)
 
 ## 💾 Installation
 
