@@ -26,10 +26,14 @@ Shop Diary is a user-friendly, feature-rich app designed to simplify the trackin
 - **Cloud Services**: Firebase Firestore  
 
 ## 📱 Screenshots
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/69af66c3-990b-4715-849d-e7ccd9883f98" width="240" height="500">
+  <img src="https://github.com/user-attachments/assets/6be12241-d0bb-453d-8c9a-7a9b75d8a065" width="240" height="500">
+  <img src="https://github.com/user-attachments/assets/be955222-41e6-49dd-9aac-6685a230c7c0" width="240" height="500">
+  <img src="https://github.com/user-attachments/assets/2ccceda6-07f5-47dc-9026-618709774a90" width="240" height="500">
+</p>
 
-[Screenshot 1](https://drive.google.com/file/d/1djVv6rlo6SjQH_vlZHRe8wjzMDJSNqpm/view?usp=drive_link)
-[Screenshot 2](https://drive.google.com/file/d/1QX_lvauDgaVhxNIBiPJD0BqXv4tzvWP7/view?usp=drive_link)
-[Screenshot 3](https://drive.google.com/file/d/1WvYHcoJ2U9xvyKVNmcQ_76cSrdW5Ed6o/view?usp=drive_link)
+
 
 ## 💾 Installation
 
